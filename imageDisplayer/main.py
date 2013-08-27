@@ -41,6 +41,20 @@ class imgDisplay(QGraphicsScene):
 
 
 
+class fileBrowser:
+	'''
+		os.listdir(path)
+		os.getcwd()
+		os.path.isdir() has some function
+	'''
+	def __init__(self):
+		pass
+
+
+	
+	def setPath(self, path):
+		pass
+
 
 
 class mainWindow(QMainWindow):
