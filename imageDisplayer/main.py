@@ -10,6 +10,8 @@ import os
 from urllib import request
 
 
+
+
 class imgDisplay(QGraphicsScene):
 	'''
 		a displayer for static and animated Pictures
@@ -30,7 +32,10 @@ class imgDisplay(QGraphicsScene):
 			self.addPixmap(self._container)
 
 	def saveImg(self, fileName):
-		self._container.save(fileName)
+		'''only not animated image can be saved
+		'''
+		if not isinstance(self._container, list):
+			self._container.save(fileName)
 
 
 	def retRect(self):
@@ -55,25 +60,44 @@ class imgDisplay(QGraphicsScene):
 
 class fileBrowser(QListView):
 	'''
-		
+		add an icon to folder, and scrollbar?
+		when an item be clicked, it should be enlight
+		can QlistView be folded?
 	'''
 	def __init__(self, view=None, path=None):
 		super().__init__()
 		self._path = os.getcwd() if path == None else path
-		self.setContent()
 		self._view = view
 
-	
+
+
+		self.setContent()
 		self.connect(self, SIGNAL('clicked(QModelIndex)'), self.loadContent)
 
 
+	def dataChanged(self):
+		print('value')
+
+
 	def loadContent(self, index):
-		fname = os.path.join(self.path, index.data())
-		if os.path.splitext(fname)[1].lower() in ''.join(self.retSupFmt()):   #check the extension
+
+		#fname = os.path.join(self.path, index.data())
+		fname = self.model.itemFromIndex(index).data()
+		
+		if os.path.isdir(fname):
+			for ifname in os.listdir(fname):
+				name = QStandardItem(fname)
+				name.setData( os.path.join(fname, ifname))
+				print(name.data())
+				self.model.itemFromIndex(index).appendRow(name)
+				# send signal dataChanged()?
+
+		elif os.path.splitext(fname)[1].lower() in ''.join(self.retSupFmt()):   #check the extension
 			obj = imgDisplay(fname)
 			self._view.setScene(obj)
 		else:
 			print('filter')
+
 
 	def retSupFmt(self):
 		''' return a generator of supported file format'''
@@ -85,7 +109,12 @@ class fileBrowser(QListView):
 		self.model = QStandardItemModel(self)
 
 		for fname in os.listdir(self.path):
+			absPath = os.path.join(self.path, fname)
 			name = QStandardItem(fname)
+			if os.path.isdir(absPath):
+				name.setIcon(QIcon('./icons/folder-close.png'))
+
+			name.setData( absPath ) #set the absolute path in dat
 			self.model.appendRow(name)
 
 		self.setModel(self.model)
@@ -107,7 +136,10 @@ class mainWindow(QMainWindow):
 	'''
 		dockwidget can only dock in qmainwindow
 
-		mission: add file browser next, and add icon control button as best as I can
+		add some keyboard control: left key and right key for surfing the image
+
+		note:
+			now, I still don't know why grid layout is strange
 
 	'''
 
