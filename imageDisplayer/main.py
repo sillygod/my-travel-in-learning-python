@@ -61,17 +61,16 @@ class imgDisplay(QGraphicsScene):
 
 
 
-class fileBrowser(QListView):
+class fileBrowser(QTreeView):
     '''
         add an icon to folder, and scrollbar?
         when an item be clicked, it should be enlight
-        can QlistView be folded?
     '''
     def __init__(self, view=None, path=None):
         super().__init__()
         self._path = os.getcwd() if path == None else path
         self._view = view
-
+        self.setHeaderHidden(True) #to hide the header
 
 
         self.setContent()
@@ -85,26 +84,8 @@ class fileBrowser(QListView):
         item = self.model.itemFromIndex(index)
         fname = item.data()
        
-        indent = '    '
-
         if os.path.isdir(fname):
-            item.setIcon(QIcon('./icons/folder-open.png'))
-            for ifname in os.listdir(fname):
-                name = QStandardItem(indent+ifname)
-                name.setData( os.path.join(fname, ifname))
-                exist = self.model.findItems(indent+ifname)
-                if  exist == []:
-                    self.model.insertRow(index.row()+1, name)
-                else:
-                    self.model.removeRow(exist[0].row())
-
-            # item = copy._copy_with_constructor(item)
-        
-            # self.model.removeRow(index.row())
-            # self.model.insertRow(index.row(), item)
-            
-            # send signal dataChanged()?
-
+            self.expand(index)
         elif os.path.splitext(fname)[1].lower() in ''.join(self.retSupFmt()):   #check the extension
             obj = imgDisplay(fname)
             self._view.setScene(obj)
@@ -117,18 +98,30 @@ class fileBrowser(QListView):
         return ('*.{}'.format(bytearray(x).decode()) for x in QImageReader.supportedImageFormats())
 
 
+    def recursiveLoad(self, path, parent=None):
+        '''path -- absPath
+        '''
+        for fname in os.listdir(path):
+            absPath = os.path.join(path, fname)
+            name = QStandardItem(fname)
+            name.setData(absPath)
+
+            if parent:
+                parent.appendRow(name)
+            else:
+                yield name
+
+            if os.path.isdir(absPath):
+                name.setIcon(QIcon('./icons/folder-close.png'))
+                for inner in self.recursiveLoad(absPath, name):
+                    yield inner
+            
+
 
     def setContent(self):
         self.model = QStandardItemModel(self)
-
-        for fname in os.listdir(self.path):
-            absPath = os.path.join(self.path, fname)
-            name = QStandardItem(fname)
-            if os.path.isdir(absPath):
-                name.setIcon(QIcon('./icons/folder-close.png'))
-
-            name.setData( absPath ) #set the absolute path in dat
-            self.model.appendRow(name)
+        for item in self.recursiveLoad(self.path):
+            self.model.appendRow(item)
 
         self.setModel(self.model)
 
@@ -148,11 +141,7 @@ class fileBrowser(QListView):
 class mainWindow(QMainWindow):
     '''
         dockwidget can only dock in qmainwindow
-
         add some keyboard control: left key and right key for surfing the image
-
-        note:
-            now, I still don't know why grid layout is strange
 
     '''
 
@@ -172,11 +161,19 @@ class mainWindow(QMainWindow):
         fileMenu.addAction(self.act['Open'])
         fileMenu.addAction(self.act['Save'])
 
+        #add dockwidget
+        logDockWidget = QDockWidget("browser", self)
+        logDockWidget.setObjectName("LogDockWidget")
+        logDockWidget.setAllowedAreas(Qt.LeftDockWidgetArea|
+                                      Qt.RightDockWidgetArea)
+
+        logDockWidget.setWidget(self.fileBrowser)
+        self.addDockWidget(Qt.LeftDockWidgetArea, logDockWidget)
+
         
         #create a widget contain filebrowser and view
         #set the layout
         grid = QGridLayout()
-        grid.addWidget(self.fileBrowser, 0, 0, 1, 2) #-1?
         grid.addWidget(self.view, 0, 1, 1, 5)
         self.ctWidget.setLayout(grid)
         self.setCentralWidget(self.ctWidget)
@@ -185,8 +182,7 @@ class mainWindow(QMainWindow):
 
 
     def createAction(self, name, slot):
-        '''
-
+        '''simple wrap for create an action
         '''
         act = QAction(name, self)
         act.triggered.connect(slot)
@@ -210,9 +206,7 @@ class mainWindow(QMainWindow):
         if fname:
             obj = imgDisplay(fname)
             self.view.setScene(obj)
-            self.resize(obj.retRect().width(), obj.retRect().height()+50)
             self.fileBrowser.path = os.path.dirname(fname)
-            # need to rethink how to resize ....
 
 
 
