@@ -9,6 +9,7 @@ import platform
 import os
 from urllib import request
 import copy
+import io
 
 
 
@@ -16,20 +17,33 @@ class imgDisplay(QGraphicsScene):
     '''
         a displayer for static and animated Pictures
     '''
-    def __init__(self, fname, parent=None):
+    def __init__(self, fname=None, byteIO=None, parent=None):
         super().__init__(parent)
-        self.img = QImageReader(fname)
-        self.rect = QRect(0, 0, self.img.size().width(), self.img.size().height())
-        self.setSceneRect(QRectF(self.retRect()))
+        self.img = None
         self._container = None
 
-        
-        if self.img.imageCount()>1:  #self.img.supportsAnimation wierd why jpg is also support?
-            super().startTimer(self.img.nextImageDelay())
-            self._distractImg()
-        else:
-            self._container = QPixmap.fromImageReader(self.img)
-            self.addPixmap(self._container)
+        if fname:
+            self.img = QImageReader(fname)
+        elif byteIO:
+            self.img = QImageReader(byteIO)
+
+        if self.img:
+            self.rect = QRect(0, 0, self.img.size().width(), self.img.size().height())
+            self.setSceneRect(QRectF(self.retRect()))
+            self._container = None
+
+            
+            if self.img.imageCount()>1:  #self.img.supportsAnimation wierd why jpg is also support?
+                super().startTimer(self.img.nextImageDelay())
+                self._distractImg()
+            else:
+                self._container = QPixmap.fromImageReader(self.img)
+                self.addPixmap(self._container)
+
+    def fromQimage(self, img):
+        self.img = img
+        self._container = QPixmap.fromImage(self.img)
+        self.addPixmap(self._container)
 
     def saveImg(self, fileName):
         '''only not animated image can be saved
@@ -114,7 +128,7 @@ class fileBrowser(QTreeView):
             if os.path.isdir(absPath):
                 name.setIcon(QIcon('./icons/folder-close.png'))
                 for inner in self.recursiveLoad(absPath, name):
-                    yield inner
+                    pass
             
 
 
@@ -170,6 +184,18 @@ class mainWindow(QMainWindow):
         logDockWidget.setWidget(self.fileBrowser)
         self.addDockWidget(Qt.LeftDockWidgetArea, logDockWidget)
 
+        #add toolbar
+        getImgFromClipboard = self.addToolBar("getImgFromClipboard")
+        btn = QPushButton('clipboard')
+        getImgFromClipboard.addWidget(btn)
+        self.connect(btn, SIGNAL("clicked()"), self.getImageFromClipboard)
+        
+        #add toolbar
+        grabImg = self.addToolBar("grabImg")
+        self.inputLabel = QLineEdit()
+        grabImg.addWidget(self.inputLabel)
+        self.connect(self.inputLabel, SIGNAL("returnPressed()"), self.getInputContent)
+
         
         #create a widget contain filebrowser and view
         #set the layout
@@ -179,6 +205,26 @@ class mainWindow(QMainWindow):
         self.setCentralWidget(self.ctWidget)
         self.view.show()
 
+    def getImageFromClipboard(self):
+        img = app.clipboard().image()
+        obj = imgDisplay()
+        obj.fromQimage(img)
+        self.view.setScene(obj)
+
+
+    def getInputContent(self):
+        '''
+            notice
+            don't write QBuffer( QByteArray(img_file.read()))
+            this will cause some problem...
+        '''
+        webImg = request.urlopen(self.inputLabel.text())
+        img_file = io.BytesIO(webImg.read())       
+        data = QByteArray(img_file.read())
+        temp = QBuffer( data )
+
+        obj = imgDisplay(byteIO=temp)
+        self.view.setScene(obj)
 
 
     def createAction(self, name, slot):
