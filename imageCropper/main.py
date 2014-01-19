@@ -1,285 +1,289 @@
-
-
 import pygame
 import sys
 from pygame.locals import *
-
-#main process class
-class App:
-    def __init__(self, width, height):
-        pygame.init()
-        self.screen = pygame.display.set_mode((width, height))
-        self.obj1 = imgObject(200,200, 0, 20)
-        self.realBG = pygame.Surface( (width, height), pygame.SRCALPHA)
-        self.realBG.fill((0,0,0,100),(0,0,width, height))
-        self.bg = imgObject(640, 480, 0, 0, 'World.png')
-        self.previewPic = imgObject(150, 150, 700, 20)
+import os
 
 
-        
-        self.control = eventController()
-        
-        @self.control.event
-        def onKeyDown(key):
-            if key == K_s:
-                pygame.image.save(self.previewPic, 'test.png')
-        
-        @self.control.event
-        def onMouseMove():
-            self.obj1.mouseMove()
+# TODO
+# first, refactor this code
+# second, add some simple gui wiget like button, label, ect.
 
-        @self.control.event
-        def onMouseDown():
-            self.obj1.mouseButtonDown()
 
-        @self.control.event
-        def onMouseUP():
-            self.obj1.mouseButtonUP()
+class Action():
 
-    
-    
-    def present(self):
-        self.screen.blit( self.realBG, (0,0) )
-        self.bg.present(self.screen)
-        self.obj1.present(self.screen)
-        tmp = self.bg.subsurface(self.obj1.getRect())
-        self.previewPic.setImg(tmp)
-        self.previewPic.present(self.screen)
-        
-        pygame.display.update()
-    
-    
-    def run(self):
-        timer = pygame.time.Clock()
-        while True:
-            timer.tick(30)
-            self.control.start(pygame.event.get())
-            self.present()
-            
-  
+    '''
+        FUNC:
+            as a adapter, to connect an object and an action
+            should it be an member of app class? or just a global object
+    '''
+    eventType = {'onKeyDown': [],
+                 'onMouseButtonDown': [],
+                 'onMouseMove': [],
+                 'onMouseButtonUP': []}
 
-#event control class      
-class eventController:
     def __init__(self):
-        
-        self.eventFunc = {
-        'onKeyDown' : self.useless,
-        'onMouseDown' : self.useless,
-        'onMouseMove' : self.useless,
-        'onMouseUP' : self.useless
-        }
-        # the key name should be the one of the following
-        # onKeyDown
-        # onMouseDown
-        # onMouseUP
-        # onMouseMove
-        
+        pass
+
+    def connect(self, *args):
+        '''
+            usage:
+            @xx.connect
+            def anything():
+                pass
+        '''
+        _func = args[0]
+        Action.eventType[_func.__name__].append(_func)
+
+
+class Controller:
+
+    '''
+        handle for the event queue
+    '''
+
+    def __init__(self, event):
+        self.event = event  # action.eventType
+
     def start(self, eventList):
         for e in eventList:
             if e.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             elif e.type == pygame.KEYDOWN:
-                self.eventFunc['onKeyDown'](e.key)
+                for func in self.event['onKeyDown']:
+                    func(e.key)
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                self.eventFunc['onMouseDown']()
+                for func in self.event['onMouseButtonDown']:
+                    func()
             elif e.type == pygame.MOUSEBUTTONUP:
-                self.eventFunc['onMouseUP']()
+                for func in self.event['onMouseButtonUP']:
+                    func()
             elif e.type == pygame.MOUSEMOTION:
-                self.eventFunc['onMouseMove']()
-    
-    def useless(self, *args):
-        ''' 
-            be used in the initialization of eventFunc.. the None can't be used here
-            because it's non-callable
-        '''
-        pass
-    
-    def event(self, *args):
-        func = args[0]
-        name = func.__name__
-        self.eventFunc[name]=func
-        
+                for func in self.event['onMouseMove']:
+                    func()
 
-        
+
+class App:
+
+    action = Action()
+
+    def __init__(self, width, height):
+        pygame.init()
+        self.screen = pygame.display.set_mode((width, height))
+        self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.realBG.fill((0, 0, 0, 100), (0, 0, width, height))
+
+        self.crop = cropRect(200, 200, 0, 0)
+        img = pygame.image.load('World.png')
+        self.bg = widget(640, 480, 0, 0)
+        self.bg.setImg(img)
+
+        self.previewPic = widget(150, 150, 700, 20)
+        self.control = Controller(App.action.eventType)
+
+        @App.action.connect
+        def onKeyDown(key):
+            if key == K_s:
+                pygame.image.save(self.previewPic, 'test.png')
+
+    def update(self):
+        self.crop.update()
+        forceInside(self.bg.get_rect(), self.crop.rect)
+        self.crop.adjustMoveRect()
+
+    def present(self):
+        self.screen.blit(self.realBG, (0, 0))
+        self.bg.present(self.screen)
+        self.crop.present(self.screen)
+        tmp = self.bg.subsurface(self.crop.rect)
+        self.previewPic.setImg(tmp)
+        self.previewPic.present(self.screen)
+
+        pygame.display.update()
+
+    def run(self):
+
+        timer = pygame.time.Clock()
+        while True:
+            timer.tick(30)
+            self.control.start(pygame.event.get())
+            self.update()
+            self.present()
+
+
 class Cursor:
+
     def __init__(self):
-        
-        
-        self.moveString =( #24X16--width x height--this is the standard in pygame
-        "           XX           ",
-        "          X..X          ",
-        "         X....X         ",
-        "           ..           ",
-        "     X     ..     X     ",
-        "    X.     ..     .X    ",
-        "   X................X   ",
-        "   X................X   ",
-        "    X.     ..     .X    ",
-        "     X     ..     X     ",
-        "           ..           ",
-        "         X....X         ",
-        "          X..X          ",
-        "           XX           ",
-        "                        ",
-        "                        ",
+
+        self.moveString = (  # 24X16--width x height--this is the standard in pygame
+            "           XX           ",
+            "          X..X          ",
+            "         X....X         ",
+            "           ..           ",
+            "     X     ..     X     ",
+            "    X.     ..     .X    ",
+            "   X................X   ",
+            "   X................X   ",
+            "    X.     ..     .X    ",
+            "     X     ..     X     ",
+            "           ..           ",
+            "         X....X         ",
+            "          X..X          ",
+            "           XX           ",
+            "                        ",
+            "                        ",
         )
-        
+
         self.stringType = {
-            'arrow' : pygame.cursors.thickarrow_strings,
-            'move' : self.moveString,
-            'resize_H' : pygame.cursors.sizer_x_strings,
-            'resize_V' : pygame.cursors.sizer_y_strings,
-            'resize_upLtTobotRt' : pygame.cursors.sizer_xy_strings,
-            'resize_upRtTobotLt' : pygame.cursors.sizer_xy_strings[13::-1]+pygame.cursors.sizer_xy_strings[14:]
+            'arrow': pygame.cursors.thickarrow_strings,
+            'move': self.moveString,
+            'resize_H': pygame.cursors.sizer_x_strings,
+            'resize_V': pygame.cursors.sizer_y_strings,
+            'resize_upLtTobotRt': pygame.cursors.sizer_xy_strings,
+            'resize_upRtTobotLt': pygame.cursors.sizer_xy_strings[13::-1] + pygame.cursors.sizer_xy_strings[14:]
         }
-    
-    
+
     def setCursor(self, type):
         string = self.stringType[type]
         cursor = pygame.cursors.compile(string)
-        size = ( len(string[0]), len(string) )
-        hotspot = (int(size[0]/2), int(size[1]/2))
-        pygame.mouse.set_cursor(size,hotspot,*cursor)
-        
+        size = (len(string[0]), len(string))
+        hotspot = (int(size[0] / 2), int(size[1] / 2))
+        pygame.mouse.set_cursor(size, hotspot, *cursor)
 
 
-class tuplePos:
+class posRecorder:
+
     def __init__(self, x=0, y=0):
         self.pos = (x, y)
+        self.delX = 0
+        self.delY = 0
 
-    def setStartPos(self, pos):
-        self.pos = pos
-
-    def getDelta(self, pos):
-        delX = pos[0] - self.pos[0] 
-        delY = pos[1] - self.pos[1]
-        self.pos = (pos[0], pos[1])
+    def getDelta(self):
+        delX, delY = self.delX, self.delY
+        self.delX, self.delY = 0, 0
         return (delX, delY)
 
-class robustRect(pygame.Rect):
-    def __init__(self, forceScope, left, top, width, height):
-        super().__init__(left, top, width, height)
-        self.forceScope = forceScope # this is the location that can't be exceed
+    def curPos(self, pos):
+        self.delX = pos[0] - self.pos[0]
+        self.delY = pos[1] - self.pos[1]
+        self.pos = (pos[0], pos[1])
 
-    def forceInside(self):
-        if self.left < self.forceScope.left:
-            self.left = self.forceScope.left
-        if self.top < self.forceScope.top:
-            self.top = self.forceScope.top
-        if self.left+self.width > self.forceScope.left+self.forceScope.width:
-            self.left -= (self.left+self.width) - (self.forceScope.left+self.forceScope.width)
-        if self.top+self.height > self.forceScope.top+self.forceScope.height:
-            self.top -= (self.top+self.height) - (self.forceScope.top+self.forceScope.height)
+    def lastPos(self, pos):
+        self.pos = pos
 
 
-class imgObject(pygame.Surface):
+def forceInside(forceScope, rect):
+    if rect.left < forceScope.left:
+        rect.left = forceScope.left
+    elif rect.top < forceScope.top:
+        rect.top = forceScope.top
+    elif rect.left + rect.width > forceScope.left + forceScope.width:
+        rect.left = (forceScope.left + forceScope.width) - rect.width
+    elif rect.top + rect.height > forceScope.top + forceScope.height:
+        rect.top = (forceScope.top + forceScope.height) - rect.height
 
-    def __init__(self, width, height, sx, sy, imageName=None):
-        super().__init__((width, height), pygame.SRCALPHA) #good!! I deal it
-        
-        tmpRect = self.get_rect()
-        locationRect = Rect(0, 0, 640, 480)
-        self.rect = robustRect( locationRect, tmpRect.left, tmpRect.top, tmpRect.width, tmpRect.height)
 
+class widget(pygame.Surface):
+
+    '''
+        pygame.Surface is similiar to the Device Content
+        so maybe it's not a good idea to use this class as
+        a widget for GUI?
+
+        a base class handle for device context...
+    '''
+
+    def __init__(self, width, height, sx, sy):
+        super().__init__((width, height), pygame.SRCALPHA)  # good!! I deal it
+
+        self.rect = self.get_rect()  # get_rect() return a new rect!
         self.cursor = Cursor()
-
         self.rect.top = sy
         self.rect.left = sx
 
-        self.moveRect = pygame.Rect(
-            self.rect.left+20,
-            self.rect.top+20,
-            self.rect.width-40,
-            self.rect.height-40)
-
-                
-        if imageName != None:
-            self.imageName = imageName
-            self.image = pygame.image.load(imageName)
-            self.setImg(self.image)
-        else:
-            self.fill((0,0,0,100),(0,0,self.rect.width, self.rect.height))
-            self.fill((255,255,255,100), (20,20,self.moveRect.width,self.moveRect.height))
-            
-        
-        self.pressedInMoveRn = False
-        self.pressedInResizeRn = False
-        self.posRecorder = tuplePos()
-
+    def isMouseIn(self, pos):
+        return self.rect.collidepoint(pos)
 
     def setImg(self, img):
         ''' here use (0,0) because it blit in itself'''
-        self.blit( pygame.transform.scale(img, (self.rect.width, self.rect.height)), (0,0) )
-
+        self.blit(pygame.transform.scale(
+            img, (self.rect.width, self.rect.height)), (0, 0))
 
     def present(self, mainSurface):
-        mainSurface.blit( pygame.transform.scale(self, (self.rect.width, self.rect.height)), self.getPos() )
-        
+        mainSurface.blit(pygame.transform.scale(
+            self, (self.rect.width, self.rect.height)), self.rect.topleft)
 
 
-    def getPos(self):
-        return self.rect.topleft
+class cropRect(widget):
 
-    def getRect(self):
-        return self.rect
+    def __init__(self, width, height, sx, sy):
+        super().__init__(width, height, sx, sy)
+        self.moveRect = pygame.Rect(
+            self.rect.left + 20,
+            self.rect.top + 20,
+            self.rect.width - 40,
+            self.rect.height - 40)
 
-    def mouseButtonUP(self):
-        self.pressedInMoveRn = False
-        self.pressedInResizeRn = False
+        self.fill((0, 0, 0, 100), (0, 0, self.rect.width, self.rect.height))
+        self.fill((255, 255, 255, 100),
+                  (20, 20, self.moveRect.width, self.moveRect.height))
 
-    def mouseButtonDown(self):
-        pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(pos):
-            if self.moveRect.collidepoint(pos) == False:
-                self.pressedInResizeRn = True
+        self.recorder = posRecorder()
+        self.moveable = False
+        self.resizeable = False
+
+        @App.action.connect
+        def onMouseButtonUP():
+            self.moveable = False
+            self.resizeable = False
+
+        @App.action.connect
+        def onMouseButtonDown():
+            pos = pygame.mouse.get_pos()
+            print(self.rect, self.moveRect)
+            if self.isMouseIn(pos):
+                if self.moveRect.collidepoint(pos):
+                    self.moveable = True
+                else:
+                    self.resizeable = True
+                self.recorder.lastPos(pos)
+
+        @App.action.connect
+        def onMouseMove():
+            pos = pygame.mouse.get_pos()
+            if self.isMouseIn(pos):
+                if self.moveRect.collidepoint(pos):
+                    self.cursor.setCursor('move')
+                else:
+                    self.cursor.setCursor('resize_H')
             else:
-                self.pressedInMoveRn = True
-            self.posRecorder.setStartPos(pos)
-            
+                self.cursor.setCursor('arrow')
 
-    def mouseMove(self):
-        pos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(pos):
-            if self.moveRect.collidepoint(pos) == False:
-                pygame.mouse.set_cursor(*pygame.cursors.broken_x)
-            else:
-                self.cursor.setCursor('move')
-        else:
-            self.cursor.setCursor('arrow')
-        
-        if self.pressedInMoveRn:
-            delX, delY = self.posRecorder.getDelta(pos)
+            if self.moveable or self.resizeable:
+                self.recorder.curPos(pos)
 
+    def adjustMoveRect(self):
+        self.moveRect = pygame.Rect(
+            self.rect.left + 20,
+            self.rect.top + 20,
+            self.rect.width - 40,
+            self.rect.height - 40)
+
+    def update(self):
+        delX, delY = self.recorder.getDelta()
+        if self.moveable:
             self.rect.move_ip(delX, delY)
-            self.rect.forceInside()
-
-            self.moveRect = pygame.Rect(
-            self.rect.left+20,
-            self.rect.top+20,
-            self.rect.width-40,
-            self.rect.height-40)
-            
-            
-        if self.pressedInResizeRn:
-            delX, delY = self.posRecorder.getDelta(pos)
-
+        elif self.resizeable:
             self.rect.width += delX
             self.rect.height += delY
-            self.rect.forceInside()
 
-            self.moveRect = pygame.Rect(
-            self.rect.left+20,
-            self.rect.top+20,
-            self.rect.width-40,
-            self.rect.height-40)
-            
+
+class Button(widget):
+
+    def __init__(self):
+        super().__init__()
 
 
 if __name__ == "__main__":
-    obj = App(860,640)
+    obj = App(860, 640)
     obj.run()
-
-    
-            
-            
