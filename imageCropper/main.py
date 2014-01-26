@@ -2,11 +2,11 @@ import pygame
 import sys
 from pygame.locals import *
 import os
-
-
+from pygame.font import SysFont
+import json
 # TODO
-# first, refactor this code
-# second, add some simple gui wiget like button, label, ect.
+# first, add some simple gui wiget like button, label, ect.
+# second, to think how to make gui wdiget beautiful structure
 
 
 class Action():
@@ -15,6 +15,10 @@ class Action():
         FUNC:
             as a adapter, to connect an object and an action
             should it be an member of app class? or just a global object
+
+        note:
+            write connect in the object __init__ method to get the self(this) attribute
+            that's now solution...
     '''
     eventType = {'onKeyDown': [],
                  'onMouseButtonDown': [],
@@ -73,6 +77,9 @@ class App:
         self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
         self.realBG.fill((0, 0, 0, 100), (0, 0, width, height))
 
+        self.btn = Button(100, 100, 700, 300)
+        self.btn.text = 'save'
+
         self.crop = cropRect(200, 200, 0, 0)
         img = pygame.image.load('World.png')
         self.bg = widget(640, 480, 0, 0)
@@ -81,15 +88,18 @@ class App:
         self.previewPic = widget(150, 150, 700, 20)
         self.control = Controller(App.action.eventType)
 
-        @App.action.connect
-        def onKeyDown(key):
-            if key == K_s:
-                pygame.image.save(self.previewPic, 'test.png')
+        self.btn.setAction(
+            lambda: pygame.image.save(self.previewPic, 'test.png'))
+        # @App.action.connect
+        # def onKeyDown(key):
+        #     if key == K_s:
+        #         pygame.image.save(self.previewPic, 'test.png')
 
     def update(self):
         self.crop.update()
         forceInside(self.bg.get_rect(), self.crop.rect)
         self.crop.adjustMoveRect()
+        self.btn.update()
 
     def present(self):
         self.screen.blit(self.realBG, (0, 0))
@@ -98,7 +108,7 @@ class App:
         tmp = self.bg.subsurface(self.crop.rect)
         self.previewPic.setImg(tmp)
         self.previewPic.present(self.screen)
-
+        self.btn.present(self.screen)
         pygame.display.update()
 
     def run(self):
@@ -135,7 +145,7 @@ class Cursor:
         )
 
         self.stringType = {
-            'arrow': pygame.cursors.thickarrow_strings,
+            'arrow': pygame.cursors.arrow,
             'move': self.moveString,
             'resize_H': pygame.cursors.sizer_x_strings,
             'resize_V': pygame.cursors.sizer_y_strings,
@@ -144,11 +154,14 @@ class Cursor:
         }
 
     def setCursor(self, type):
-        string = self.stringType[type]
-        cursor = pygame.cursors.compile(string)
-        size = (len(string[0]), len(string))
-        hotspot = (int(size[0] / 2), int(size[1] / 2))
-        pygame.mouse.set_cursor(size, hotspot, *cursor)
+        if isinstance(self.stringType[type][0], str):
+            string = self.stringType[type]
+            cursor = pygame.cursors.compile(string)
+            size = (len(string[0]), len(string))
+            hotspot = (int(size[0] / 2), int(size[1] / 2))
+            pygame.mouse.set_cursor(size, hotspot, *cursor)
+        else:
+            pygame.mouse.set_cursor(*self.stringType[type])
 
 
 class posRecorder:
@@ -175,11 +188,11 @@ class posRecorder:
 def forceInside(forceScope, rect):
     if rect.left < forceScope.left:
         rect.left = forceScope.left
-    elif rect.top < forceScope.top:
+    if rect.top < forceScope.top:
         rect.top = forceScope.top
-    elif rect.left + rect.width > forceScope.left + forceScope.width:
+    if rect.left + rect.width > forceScope.left + forceScope.width:
         rect.left = (forceScope.left + forceScope.width) - rect.width
-    elif rect.top + rect.height > forceScope.top + forceScope.height:
+    if rect.top + rect.height > forceScope.top + forceScope.height:
         rect.top = (forceScope.top + forceScope.height) - rect.height
 
 
@@ -201,17 +214,35 @@ class widget(pygame.Surface):
         self.rect.top = sy
         self.rect.left = sx
 
+        # self._style = json.loads('')
+
+    @property
+    def width(self):
+        return self.rect.width
+
+    @width.setter
+    def width(self, value):
+        self.rect.width = value
+
+    @property
+    def height(self):
+        return self.rect.height
+
+    @height.setter
+    def height(self, value):
+        self.rect.height = value
+
     def isMouseIn(self, pos):
         return self.rect.collidepoint(pos)
 
     def setImg(self, img):
         ''' here use (0,0) because it blit in itself'''
         self.blit(pygame.transform.scale(
-            img, (self.rect.width, self.rect.height)), (0, 0))
+            img, (self.width, self.height)), (0, 0))
 
     def present(self, mainSurface):
         mainSurface.blit(pygame.transform.scale(
-            self, (self.rect.width, self.rect.height)), self.rect.topleft)
+            self, (self.width, self.height)), self.rect.topleft)
 
 
 class cropRect(widget):
@@ -223,10 +254,6 @@ class cropRect(widget):
             self.rect.top + 20,
             self.rect.width - 40,
             self.rect.height - 40)
-
-        self.fill((0, 0, 0, 100), (0, 0, self.rect.width, self.rect.height))
-        self.fill((255, 255, 255, 100),
-                  (20, 20, self.moveRect.width, self.moveRect.height))
 
         self.recorder = posRecorder()
         self.moveable = False
@@ -240,7 +267,6 @@ class cropRect(widget):
         @App.action.connect
         def onMouseButtonDown():
             pos = pygame.mouse.get_pos()
-            print(self.rect, self.moveRect)
             if self.isMouseIn(pos):
                 if self.moveRect.collidepoint(pos):
                     self.moveable = True
@@ -264,12 +290,12 @@ class cropRect(widget):
 
     def adjustMoveRect(self):
         self.moveRect = pygame.Rect(
-            self.rect.left + 20,
-            self.rect.top + 20,
-            self.rect.width - 40,
-            self.rect.height - 40)
+            self.rect.left + 5,
+            self.rect.top + 5,
+            self.rect.width - 10,
+            self.rect.height - 10)
 
-    def update(self):
+    def update(self):  # here need to redraw
         delX, delY = self.recorder.getDelta()
         if self.moveable:
             self.rect.move_ip(delX, delY)
@@ -277,11 +303,59 @@ class cropRect(widget):
             self.rect.width += delX
             self.rect.height += delY
 
+    def present(self, mainSurface):
+        self.fill((0, 0, 0, 100), (0, 0, self.width, self.height))
+        super().present(mainSurface)
+
 
 class Button(widget):
 
+    '''
+        a button widget can be clicked to cause an action
+        and a button can be displayed by image or text(is centered by default)
+    '''
+
+    def __init__(self, width, height, sx, sy):
+        super().__init__(width, height, sx, sy)
+        self._text = ''
+        self._action = None  # a function object
+        self._background = (0, 0, 0)  # default is black
+
+        @App.action.connect
+        def onMouseButtonDown():
+            pos = pygame.mouse.get_pos()
+            if self.isMouseIn(pos):
+                self._action()
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, text):
+        self._text = text
+        font = SysFont('consola', 60)
+        self._font = font.render(self._text, True, (255, 0, 0))
+        print(self._font.get_width(), self._font.get_height())
+        # well, figure out what the font's width is depended on
+
+    def setAction(self, action):
+        self._action = action
+
+    def update(self):
+        self.blit(
+            self._font, ((self.width - self._font.get_width()) / 2, (self.height - self._font.get_height()) / 2))
+
+
+class Label(widget):
+
+    '''
+        FUNC:
+
+    '''
+
     def __init__(self):
-        super().__init__()
+        pass
 
 
 if __name__ == "__main__":
