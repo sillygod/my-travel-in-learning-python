@@ -178,7 +178,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             don't write QBuffer( QByteArray(img_file.read()))
             this will cause some problem...
         '''
-        webImg = request.urlopen(self.inputLabel.text())
+        webImg = request.urlopen(self.lineEdit.text())
         img_file = io.BytesIO(webImg.read())
         data = QByteArray(img_file.read())
         temp = QBuffer(data)
