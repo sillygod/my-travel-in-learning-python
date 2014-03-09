@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title></title>
+
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    </head>
+    <body>
+        <nav>
+            <li><a href='a.html'>a here</a></li>
+            <li><a href='b.html'>b here</a></li>
+        </nav>
+        <div id='content'>why why why...</div>
+
+    </body>
+</html>
+
+<script>
+
+    $('#content').click(function(){
+        console.log('be clicked');
+    });
+
+
+    console.log('ha');
+    $('nav li a').click(function(e){
+        e.preventDefault();
+        var href = $(this).attr('href');
+        $('#content').load(href, function(){
+            console.log('load complete..');
+        });
+    });
+</script>
