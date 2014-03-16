@@ -1,35 +1,60 @@
 <!DOCTYPE html>
 <html>
+
+<!--
+    http://oncrashreboot.com/elegant-best-pelican-theme-features
+    1. start to think how to design layout
+    2. transform to Jinja2
+    3. encapsulate in a template
+
+-->
     <head>
         <meta charset='utf-8'>
         <title></title>
 
         <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-
+        <link rel="stylesheet" type="text/css" href="main.css">
     </head>
     <body>
-        <nav>
-            <li><a href='a.html'>a here</a></li>
-            <li><a href='b.html'>b here</a></li>
-        </nav>
-        <div id='content'>why why why...</div>
+        <header>
+            <img alt='logo' src=''/>
+            <p>My travel in programming</p>
+        </header>
 
+        <nav>
+            <ul>
+                <li><a href='home.html'>home</a></li>
+                <li><a href='blog.html'>blog</a></li>
+                <li><a href='about.html'>about me</a></li>
+            </ul>
+        </nav>
+        <div id='content'>
+            <div id='inner'>
+            </div>
+        </div>
+        <footer>
+            This is footer
+        </footer>
     </body>
 </html>
 
 <script>
 
-    $('#content').click(function(){
-        console.log('be clicked');
-    });
+    (function() {
+        $('nav li a').click(function(e){
+            e.preventDefault();
+            var href = $(this).attr('href');
 
-
-    console.log('ha');
-    $('nav li a').click(function(e){
-        e.preventDefault();
-        var href = $(this).attr('href');
-        $('#content').load(href, function(){
-            console.log('load complete..');
+            $('#inner').load(href, function(){
+                console.log('load complete..');
+            });
         });
-    });
+
+        $('#inner').load($('nav li a').attr('href'), function(){
+            console.log('home is loaded');
+        });
+
+
+    })();
+
 </script>
