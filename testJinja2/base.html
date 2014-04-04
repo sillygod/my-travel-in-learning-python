@@ -16,9 +16,21 @@
         <link rel="stylesheet" type="text/css" href="main.css">
     </head>
     <body>
+        <div class='full-screen'>
+        </div>
+
         <header>
             <img alt='logo' src=''/>
             <p>My travel in programming</p>
+
+            <form id='search-bar'>
+                <div>
+                    <input type="text">
+                </div>
+                <div>
+                    <input type="submit" value="search">
+                </div>
+            </form>
         </header>
 
         <nav>
@@ -28,6 +40,14 @@
                 <li><a href='about.html'>about me</a></li>
             </ul>
         </nav>
+
+
+        <div id='quick-link' class='quick-link'>
+        <!-- use js to dynamically create a full screen div?-->
+        quick link
+        </div>
+
+
         <div id='content'>
             <div id='inner'>
             </div>
@@ -40,7 +60,7 @@
 
 <script>
 
-    (function() {
+    (function($) {
         $('nav li a').click(function(e){
             e.preventDefault();
             var href = $(this).attr('href');
@@ -55,6 +75,19 @@
         });
 
 
-    })();
+        // control the quick link widget
+        $('#quick-link').click(function(e){
+            if( !$(this).hasClass('animate-test') ){
+                $(this).addClass('animate-test');
+                $('.full-screen').css('display', 'block');
+            }
+            else{
+                $(this).removeClass('animate-test');
+                $('.full-screen').css('display', 'none');
+            }
+        })
+
+
+    })(jQuery);
 
 </script>

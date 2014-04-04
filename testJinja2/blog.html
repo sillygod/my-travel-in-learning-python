@@ -1,59 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="./blog.css">
     <title></title>
-    <style type="text/css">
-        .spinner {
-          position: relative;
-          width: 100px;
-          height: 100px;
-          background: #ec5840;
-          border-radius: 100%;
-          opacity: 0.7;
-        }
-        .spinner:before {
-          content: "...";
-          text-align: center;
-          line-height: 50px;
-          font-size: 60px;
-          color: #EEEEEE;
-          top: 10px;
-          left: 10px;
-          z-index: 1;
-          position: absolute;
-          display: block;
-          width: 80px;
-          height: 80px;
-          border-radius: 100%;
-          background: rgba(0,0,0,1);
-        }
 
-        .spinner:after {
-          content: "";
-          display: block;
-          z-index: 0;
-          position: absolute;
-          width: 100px;
-          height: 100px;
-          border-radius: 100%;
-          background: linear-gradient( 420deg, transparent 50%, #CECECE 50%), linear-gradient(90deg, #CECECE 50%, transparent 50% );
-          -webkit-animation: spinner 2s infinite linear;
-          animation: spinner 2s infinite linear;
-        }
-        @-webkit-keyframes spinner {
-          from {-webkit-transform:rotate(0deg);}
-          to {-webkit-transform:rotate(360deg);}
-        }
-        @keyframes spinner {
-          from {transform:rotate(0deg);}
-          to {transform:rotate(360deg);}
-        }
-    </style>
 </head>
 <body>
 
+
+    <div class='table-view'>
+        <!-- use display:table to make a table view
+             like this..
+                _________________________
+               |                 |       |
+               |                 |       |
+               |      post       | tag   |
+               |                 |       |
+               |                 |       |
+               |_________________|_______|
+
+        -->
+        <div class='blog-post table-cell'>
+            <!-- five posts every page -->
+            <article>This is an article..
+            <div>read more</div>
+            </article>
+
+            <article>this is another article
+            <div>read more</div>
+            </article>
+        </div>
+
+        <div class='post-tag table-cell'>
+            <ul>
+                <li>one</li>
+                <li>two</li>
+            </ul>
+        </div>
+
+    </div>
+    <div>
+        old
+        new
+    </div>
 </body>
 </html>
 
-
-<div class="spinner"></div>

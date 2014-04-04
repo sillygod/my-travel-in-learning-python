@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Sonsie+One);
+
 * {
     margin: 0 auto;
 }
@@ -8,36 +10,101 @@ body {
     font-family: Arial;
 }
 
+#inner {
+    padding: 10px;
+}
+
+
+/*use css3 to create animation*/
+
+.quick-link {
+    position: fixed;
+    left: 95%;
+    top: 50%;
+    background: rgba(10, 10, 10, 0.6);
+    min-height: 65px;
+    min-width: 65px;
+    border-radius: 5px;
+    -webkit-transition: all 1s;
+    transition: all 1s;
+}
+
+.quick-link:hover {
+    cursor: pointer;
+}
+
+.animate-test {
+    left: 40%;
+    min-width: 250px;
+    min-height: 250px;
+}
+
+.full-screen {
+    width: 9999px;
+    height: 100%;
+    background: rgba(100, 100, 100, 0.6);
+    position: fixed;
+    left: 0px;
+    display: none;
+}
+
+/**/
 
 #content {
     margin-top: 20px;
     width: 80%;
-    min-height: 500px;
+    min-height: 650px;
 }
 
 header {
+    position: relative;
     height: 170px;
     background: rgb(20,20,20);
     margin-bottom: 10px;
 }
 
 header p {
-    font-size: 40px;
+    font-size: 35px;
+    font-family: 'Sonsie One', cursive;
+}
+
+#search-bar {
+    position: absolute;
+    right: 0px;
+    bottom: 10px;
+    width: 200px;
+}
+
+#search-bar input {
+    color: rgba(200, 200, 200, 0.6);
+    background: none;
+    border: none;
+    height: 30px;
+}
+
+#search-bar div:first-child {
+    background: rgba(0, 0, 0, 0.5);
+    display: inline-block;
+}
+
+
+#search-bar div:nth-child(2) {
+    background: rgb(10, 120, 10);
+    display: inline-block;
 }
 
 
 nav {
     min-height: 50px;
+    width: 80%;
 }
 
 nav ul {
-    text-align: center;
     padding: 0;
 }
 
 nav ul li {
     position: relative;
-
     display: inline-block;
     margin: 10px;
     padding: 15px;
