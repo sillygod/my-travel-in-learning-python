@@ -3,7 +3,6 @@ import sys
 from pygame.locals import *
 import os
 from pygame.font import SysFont
-import json
 # TODO
 # first, add some simple gui wiget like button, label, ect.
 # second, to think how to make gui wdiget beautiful structure
@@ -74,18 +73,16 @@ class App:
     def __init__(self, width, height):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
+
         self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
         self.realBG.fill((0, 0, 0, 100), (0, 0, width, height))
 
-        self.btn = Button(100, 100, 700, 300)
+        self.render = render(self.realBG)
+        self.btn = Button(x=300, y=100, width=100, height=100)
         self.btn.text = 'save'
 
-        self.crop = cropRect(200, 200, 0, 0)
-        img = pygame.image.load('World.png')
-        self.bg = widget(640, 480, 0, 0)
-        self.bg.setImg(img)
+        self.img = wImage('World.png', x=20, y=20, width=200, height=200)
 
-        self.previewPic = widget(150, 150, 700, 20)
         self.control = Controller(App.action.eventType)
 
         self.btn.setAction(
@@ -96,19 +93,13 @@ class App:
         #         pygame.image.save(self.previewPic, 'test.png')
 
     def update(self):
-        self.crop.update()
-        forceInside(self.bg.get_rect(), self.crop.rect)
-        self.crop.adjustMoveRect()
         self.btn.update()
 
     def present(self):
+
+        self.render.render(self.img)
+        self.render.render(self.btn)
         self.screen.blit(self.realBG, (0, 0))
-        self.bg.present(self.screen)
-        self.crop.present(self.screen)
-        tmp = self.bg.subsurface(self.crop.rect)
-        self.previewPic.setImg(tmp)
-        self.previewPic.present(self.screen)
-        self.btn.present(self.screen)
         pygame.display.update()
 
     def run(self):
@@ -196,53 +187,109 @@ def forceInside(forceScope, rect):
         rect.top = (forceScope.top + forceScope.height) - rect.height
 
 
-class widget(pygame.Surface):
+class widget:
 
     '''
-        pygame.Surface is similiar to the Device Content
-        so maybe it's not a good idea to use this class as
-        a widget for GUI?
+        this is a basic element of gui.
+        I think it should contain some attributes..
 
-        a base class handle for device context...
+        postition
+        bg color
+        border
+
+        and even need some behavior like detect mouse and keyboard aciton..
     '''
 
-    def __init__(self, width, height, sx, sy):
-        super().__init__((width, height), pygame.SRCALPHA)  # good!! I deal it
+    def __init__(self, **kwargs):
+        '''
+            x
+            y
+            width
+            height
+            border
+            background color
+        '''
+        self.rect = pygame.Rect(kwargs.get('x', 0),
+                                kwargs.get('y', 0),
+                                kwargs.get('width', 0),
+                                kwargs.get('height', 0))
+        self.bgColor = kwargs.get('bgColor', (0, 0, 0))
+        self.border = kwargs.get(
+            'border', {'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (120, 20, 30)})
+        self.padding = kwargs.get(
+            'padding', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0})
+        self.margin = kwargs.get(
+            'padding', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0})
+        self.content = {}  # ex. [img, x, y]
 
-        self.rect = self.get_rect()  # get_rect() return a new rect!
-        self.cursor = Cursor()
-        self.rect.top = sy
-        self.rect.left = sx
-
-        # self._style = json.loads('')
-
-    @property
-    def width(self):
-        return self.rect.width
-
-    @width.setter
-    def width(self, value):
-        self.rect.width = value
-
-    @property
-    def height(self):
-        return self.rect.height
-
-    @height.setter
-    def height(self, value):
-        self.rect.height = value
-
-    def isMouseIn(self, pos):
+    def isPosIn(self, pos):
         return self.rect.collidepoint(pos)
 
-    def setImg(self, img):
-        ''' here use (0,0) because it blit in itself'''
-        self.blit(pygame.transform.scale(
-            img, (self.width, self.height)), (0, 0))
+    def update(self):
+        raise NotImplementedError
 
-    def present(self, mainSurface):
-        mainSurface.blit(pygame.transform.scale(
-            self, (self.width, self.height)), self.rect.topleft)
+
+class wImage(widget):
+
+    '''
+    '''
+
+    def __init__(self, fname, **kwargs):
+        super().__init__(**kwargs)
+        self.img = pygame.transform.scale(pygame.image.load(fname),
+                                         (self.rect.width, self.rect.height))
+        self.content['image'] = [self.img, (self.rect.x, self.rect.y)]
+
+
+class render:
+
+    '''
+        responsible for the display of gui widget
+        I think there should be an object as a Controller
+        it can receive the data from the widget and then
+        draw its outline on the window
+    '''
+
+    def __init__(self, screen):
+        self._hdc = screen  # get the DC
+
+    def render(self, widget):
+        ''' draw background first
+            then border
+            content ex. image, font, etc.
+        '''
+        self._hdc.fill(widget.bgColor, widget.rect)
+        if(widget.border['top'] > 0):
+            pygame.draw.line(self._hdc, widget.border['color'],
+                            (widget.rect.x, widget.rect.y),
+                            (widget.rect.right, widget.rect.y),
+                             widget.border['top'])
+        if(widget.border['left'] > 0):
+            pygame.draw.line(self._hdc, widget.border['color'],
+                            (widget.rect.x, widget.rect.y),
+                            (widget.rect.x, widget.rect.bottom),
+                             widget.border['left'])
+        if(widget.border['right'] > 0):
+            pygame.draw.line(self._hdc, widget.border['color'],
+                            (widget.rect.right, widget.rect.y),
+                            (widget.rect.right, widget.rect.bottom),
+                             widget.border['right'])
+        if(widget.border['bottom'] > 0):
+            pygame.draw.line(self._hdc, widget.border['color'],
+                            (widget.rect.x, widget.rect.bottom),
+                            (widget.rect.right, widget.rect.bottom),
+                             widget.border['bottom'])
+        for c in widget.content.values():
+            self._hdc.blit(*c)  # unpack
+
+
+class Window:
+
+    '''
+    '''
+
+    def __init__(self):
+        pass
 
 
 class cropRect(widget):
@@ -255,6 +302,7 @@ class cropRect(widget):
             self.rect.width - 40,
             self.rect.height - 40)
 
+        self.cursor = Cursor()
         self.recorder = posRecorder()
         self.moveable = False
         self.resizeable = False
@@ -304,7 +352,7 @@ class cropRect(widget):
             self.rect.height += delY
 
     def present(self, mainSurface):
-        self.fill((0, 0, 0, 100), (0, 0, self.width, self.height))
+        self.fill((0, 0, 0, 100), self._rect)
         super().present(mainSurface)
 
 
@@ -313,19 +361,29 @@ class Button(widget):
     '''
         a button widget can be clicked to cause an action
         and a button can be displayed by image or text(is centered by default)
+
+        now, need to consider some point...
+        1. decide the button size which is depended on content(ex. text, img, etc..)
+        2. border size
+        3. padding size
     '''
 
-    def __init__(self, width, height, sx, sy):
-        super().__init__(width, height, sx, sy)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._state = ''
+        self._style = {
+            'in': (105, 20, 20, 10), 'out': (50, 50, 55, 10), 'press': (255, 0, 0)}
+
         self._text = ''
         self._action = None  # a function object
-        self._background = (0, 0, 0)  # default is black
 
         @App.action.connect
-        def onMouseButtonDown():
+        def onMouseMove():
             pos = pygame.mouse.get_pos()
-            if self.isMouseIn(pos):
-                self._action()
+            if self.isPosIn(pos):
+                self._state = 'in'
+            else:
+                self._state = 'out'
 
     @property
     def text(self):
@@ -336,15 +394,20 @@ class Button(widget):
         self._text = text
         font = SysFont('consola', 60)
         self._font = font.render(self._text, True, (255, 0, 0))
-        print(self._font.get_width(), self._font.get_height())
         # well, figure out what the font's width is depended on
+        self.content['font'] = [self._font,
+                                (self.rect.centerx - self._font.get_width() / 2, self.rect.centery - self._font.get_height() / 2)]
 
     def setAction(self, action):
-        self._action = action
+        @App.action.connect
+        def onMouseButtonDown():
+            pos = pygame.mouse.get_pos()
+            if self.isPosIn(pos):
+                self._state = 'press'
+                action()
 
     def update(self):
-        self.blit(
-            self._font, ((self.width - self._font.get_width()) / 2, (self.height - self._font.get_height()) / 2))
+        self.bgColor = self._style[self._state]
 
 
 class Label(widget):
@@ -354,7 +417,7 @@ class Label(widget):
 
     '''
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
 
