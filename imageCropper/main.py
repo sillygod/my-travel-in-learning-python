@@ -75,13 +75,16 @@ class App:
         self.screen = pygame.display.set_mode((width, height))
 
         self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
-        self.realBG.fill((0, 0, 0, 100), (0, 0, width, height))
 
         self.render = render(self.realBG)
-        self.btn = Button(x=300, y=100, width=100, height=100)
+        self.btn = Button(x=20, y=340, width=100, height=100,
+                          border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)})
         self.btn.text = 'save'
 
-        self.img = wImage('World.png', x=20, y=20, width=200, height=200)
+        self.crop = cropRect(x=20, y=20, width=300, height=300)
+        self.crop.loadImg('World.png')
+
+        self.previewPic = wImage(x=400, y=50, width=150, height=150)
 
         self.control = Controller(App.action.eventType)
 
@@ -93,11 +96,14 @@ class App:
         #         pygame.image.save(self.previewPic, 'test.png')
 
     def update(self):
+        self.crop.update()
+        self.previewPic.copyFromImg(self.crop.retCropImg())
         self.btn.update()
 
     def present(self):
-
-        self.render.render(self.img)
+        self.realBG.fill((0, 0, 0))
+        self.render.render(self.crop)
+        self.render.render(self.previewPic)
         self.render.render(self.btn)
         self.screen.blit(self.realBG, (0, 0))
         pygame.display.update()
@@ -187,6 +193,46 @@ def forceInside(forceScope, rect):
         rect.top = (forceScope.top + forceScope.height) - rect.height
 
 
+class render:
+
+    '''
+        responsible for the display of gui widget
+        I think there should be an object as a Controller
+        it can receive the data from the widget and then
+        draw its outline on the window
+    '''
+
+    def __init__(self, screen):
+        self._hdc = screen  # get the DC
+
+    def render(self, widget):
+        ''' draw background first
+            then border
+            content ex. image, font, etc.
+
+            add border outside the rect region
+            in order to fill the space of the corner,
+            top and bottom border add extra length to fill that.
+
+        '''
+        self._hdc.fill(widget.bgColor, widget.rect)
+        if(isinstance(widget.border['top'], pygame.Rect)):
+            pygame.draw.rect(
+                self._hdc, widget.border['color'], widget.border['top'])
+        if(isinstance(widget.border['left'], pygame.Rect)):
+            pygame.draw.rect(
+                self._hdc, widget.border['color'], widget.border['left'])
+        if(isinstance(widget.border['right'], pygame.Rect)):
+            pygame.draw.rect(
+                self._hdc, widget.border['color'], widget.border['right'])
+        if(isinstance(widget.border['bottom'], pygame.Rect)):
+            pygame.draw.rect(
+                self._hdc, widget.border['color'], widget.border['bottom'])
+
+        for c in widget.content.values():
+            self._hdc.blit(*c)  # unpack
+
+
 class widget:
 
     '''
@@ -197,7 +243,7 @@ class widget:
         bg color
         border
 
-        and even need some behavior like detect mouse and keyboard aciton..
+        add detect if mouse pos is in the border or not...
     '''
 
     def __init__(self, **kwargs):
@@ -215,12 +261,39 @@ class widget:
                                 kwargs.get('height', 0))
         self.bgColor = kwargs.get('bgColor', (0, 0, 0))
         self.border = kwargs.get(
-            'border', {'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (120, 20, 30)})
+            'border', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0, 'color': (0, 0, 0)})
         self.padding = kwargs.get(
             'padding', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0})
         self.margin = kwargs.get(
             'padding', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0})
         self.content = {}  # ex. [img, x, y]
+
+        self.setBorder()
+
+    def move(self, x, y):
+        '''update the all Rect's position if call move func '''
+        self.rect.move_ip(x, y)
+        for key in self.border:
+            if key != 'color' and isinstance(self.border[key], pygame.Rect):
+                self.border[key].move_ip(x, y)
+
+    def setBorder(self):
+        bdWidth = self.border['top']
+        if bdWidth > 0:
+            self.border['top'] = pygame.Rect(
+                self.rect.x - bdWidth, self.rect.y - bdWidth, self.rect.width + 2 * bdWidth, bdWidth)
+        bdWidth = self.border['left']
+        if bdWidth > 0:
+            self.border['left'] = pygame.Rect(
+                self.rect.x - bdWidth, self.rect.y, bdWidth, self.rect.height)
+        bdWidth = self.border['right']
+        if bdWidth > 0:
+            self.border['right'] = pygame.Rect(
+                self.rect.right, self.rect.y, bdWidth, self.rect.height)
+        bdWidth = self.border['bottom']
+        if bdWidth > 0:
+            self.border['bottom'] = pygame.Rect(
+                self.rect.x - bdWidth, self.rect.bottom, self.rect.width + 2 * bdWidth, bdWidth)
 
     def isPosIn(self, pos):
         return self.rect.collidepoint(pos)
@@ -234,53 +307,28 @@ class wImage(widget):
     '''
     '''
 
-    def __init__(self, fname, **kwargs):
+    def __init__(self, fname=None, **kwargs):
         super().__init__(**kwargs)
-        self.img = pygame.transform.scale(pygame.image.load(fname),
-                                         (self.rect.width, self.rect.height))
-        self.content['image'] = [self.img, (self.rect.x, self.rect.y)]
+        if fname is not None:
+            self.img = pygame.image.load(fname)
+            self.resize_img = None
+            self.alpha = 255
+            self.resize(self.rect.width, self.rect.height)
 
+    def resize(self, width, height):
+        self.rect.width, self.rect.height = width, height
+        self.resize_img = pygame.transform.scale(
+            self.img, (self.rect.width, self.rect.height))
 
-class render:
+        self.content['image'] = [self.resize_img, (self.rect.x, self.rect.y)]
 
-    '''
-        responsible for the display of gui widget
-        I think there should be an object as a Controller
-        it can receive the data from the widget and then
-        draw its outline on the window
-    '''
+    def setAlpha(self, value):
+        self.resize_img.set_alpha(value)
+        self.content['image'] = [self.resize_img, (self.rect.x, self.rect.y)]
 
-    def __init__(self, screen):
-        self._hdc = screen  # get the DC
-
-    def render(self, widget):
-        ''' draw background first
-            then border
-            content ex. image, font, etc.
-        '''
-        self._hdc.fill(widget.bgColor, widget.rect)
-        if(widget.border['top'] > 0):
-            pygame.draw.line(self._hdc, widget.border['color'],
-                            (widget.rect.x, widget.rect.y),
-                            (widget.rect.right, widget.rect.y),
-                             widget.border['top'])
-        if(widget.border['left'] > 0):
-            pygame.draw.line(self._hdc, widget.border['color'],
-                            (widget.rect.x, widget.rect.y),
-                            (widget.rect.x, widget.rect.bottom),
-                             widget.border['left'])
-        if(widget.border['right'] > 0):
-            pygame.draw.line(self._hdc, widget.border['color'],
-                            (widget.rect.right, widget.rect.y),
-                            (widget.rect.right, widget.rect.bottom),
-                             widget.border['right'])
-        if(widget.border['bottom'] > 0):
-            pygame.draw.line(self._hdc, widget.border['color'],
-                            (widget.rect.x, widget.rect.bottom),
-                            (widget.rect.right, widget.rect.bottom),
-                             widget.border['bottom'])
-        for c in widget.content.values():
-            self._hdc.blit(*c)  # unpack
+    def copyFromImg(self, image):
+        self.img = image
+        self.resize(self.rect.width, self.rect.height)
 
 
 class Window:
@@ -290,70 +338,6 @@ class Window:
 
     def __init__(self):
         pass
-
-
-class cropRect(widget):
-
-    def __init__(self, width, height, sx, sy):
-        super().__init__(width, height, sx, sy)
-        self.moveRect = pygame.Rect(
-            self.rect.left + 20,
-            self.rect.top + 20,
-            self.rect.width - 40,
-            self.rect.height - 40)
-
-        self.cursor = Cursor()
-        self.recorder = posRecorder()
-        self.moveable = False
-        self.resizeable = False
-
-        @App.action.connect
-        def onMouseButtonUP():
-            self.moveable = False
-            self.resizeable = False
-
-        @App.action.connect
-        def onMouseButtonDown():
-            pos = pygame.mouse.get_pos()
-            if self.isMouseIn(pos):
-                if self.moveRect.collidepoint(pos):
-                    self.moveable = True
-                else:
-                    self.resizeable = True
-                self.recorder.lastPos(pos)
-
-        @App.action.connect
-        def onMouseMove():
-            pos = pygame.mouse.get_pos()
-            if self.isMouseIn(pos):
-                if self.moveRect.collidepoint(pos):
-                    self.cursor.setCursor('move')
-                else:
-                    self.cursor.setCursor('resize_H')
-            else:
-                self.cursor.setCursor('arrow')
-
-            if self.moveable or self.resizeable:
-                self.recorder.curPos(pos)
-
-    def adjustMoveRect(self):
-        self.moveRect = pygame.Rect(
-            self.rect.left + 5,
-            self.rect.top + 5,
-            self.rect.width - 10,
-            self.rect.height - 10)
-
-    def update(self):  # here need to redraw
-        delX, delY = self.recorder.getDelta()
-        if self.moveable:
-            self.rect.move_ip(delX, delY)
-        elif self.resizeable:
-            self.rect.width += delX
-            self.rect.height += delY
-
-    def present(self, mainSurface):
-        self.fill((0, 0, 0, 100), self._rect)
-        super().present(mainSurface)
 
 
 class Button(widget):
@@ -419,6 +403,87 @@ class Label(widget):
 
     def __init__(self, **kwargs):
         pass
+
+
+class cropRect(widget):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.img = None
+        self.displayImg = None
+        self.cursor = Cursor()
+        self.crop = wImage(x=50, y=50, width=150, height=150,
+                           border={'top': 3, 'left': 3, 'right': 3, 'bottom': 3, 'color': (30, 30, 30)})
+        self.hdc = pygame.Surface(
+            (self.rect.width, self.rect.height), pygame.SRCALPHA)
+
+        self._render = render(self.hdc)  # inner render for std widget
+
+        self.moveable = False
+        self.resizeable = False
+
+        @App.action.connect
+        def onMouseMove():
+            pos = pygame.mouse.get_pos()
+            delpos = pygame.mouse.get_rel()
+            #offset coordinate
+            pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
+            if self.isInBorder(pos):
+                self.cursor.setCursor('resize_H')
+            elif self.crop.isPosIn(pos):
+                self.cursor.setCursor('move')
+            else:
+                self.cursor.setCursor('arrow')
+
+            if self.moveable:
+                self.crop.move(*delpos)
+                self.updateCrop()
+            if self.resizeable:
+                self.crop.resize(self.crop.rect.width+delpos[0],
+                                 self.crop.rect.height+delpos[1])
+                self.updateCrop()
+
+        @App.action.connect
+        def onMouseButtonDown():
+            pos = pygame.mouse.get_pos()
+            pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
+            #offset coordinate
+            if self.isInBorder(pos):
+                self.resizeable = True
+            elif self.crop.isPosIn(pos):
+                self.moveable = True
+
+        @App.action.connect
+        def onMouseButtonUP():
+            self.moveable = False
+            self.resizeable = False
+
+    def isInBorder(self, pos):
+        for key in self.crop.border:
+            if key != 'color' and self.crop.border[key].collidepoint(pos):
+                return True
+        return False
+
+    def loadImg(self, fname):
+        self.img = wImage(
+            fname, x=0, y=0, width=self.rect.width, height=self.rect.height)
+        self.displayImg = wImage(x=0, y=0, width=self.rect.width, height=self.rect.height)
+        self.updateCrop()
+
+    def updateCrop(self):
+        self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
+        self.displayImg.copyFromImg(self.img.resize_img)
+        self.displayImg.setAlpha(120)
+
+    def retCropImg(self):
+        '''return a crop Image '''
+        return self.crop.resize_img
+
+    def update(self):
+        self.hdc.fill((0, 0, 0))  # well, note this haha
+        self._render.render(self.displayImg)
+        self._render.render(self.crop)
+        self.content['surface'] = [self.hdc, (self.rect.x, self.rect.y)]
 
 
 if __name__ == "__main__":
