@@ -35,9 +35,9 @@
 
         <nav>
             <ul>
-                <li><a href='home.html'>home</a></li>
-                <li><a href='blog.html'>blog</a></li>
-                <li><a href='about.html'>about me</a></li>
+                <li class='link-home'><a href='home.html'>home</a></li>
+                <li class='link-blog'><a href='blog.html'>blog</a></li>
+                <li class='link-about'><a href='about.html'>about me</a></li>
             </ul>
         </nav>
 
@@ -48,12 +48,12 @@
         </div>
 
 
-        <div id='content'>
+        <div class= 'link-home' id='content'>
             <div id='inner'>
             </div>
         </div>
         <footer>
-            This is footer
+            powered by sillygod
         </footer>
     </body>
 </html>
@@ -64,6 +64,11 @@
         $('nav li a').click(function(e){
             e.preventDefault();
             var href = $(this).attr('href');
+
+            $('#content').removeClass(function(){
+                return $(this).attr('class');
+            })
+            $('#content').addClass($(this).parent().attr('class'));
 
             $('#inner').load(href, function(){
                 console.log('load complete..');
@@ -85,7 +90,7 @@
                 $(this).removeClass('animate-test');
                 $('.full-screen').css('display', 'none');
             }
-        })
+        });
 
 
     })(jQuery);

@@ -16,8 +16,8 @@
 
 .blog-post article {
     position: relative;
-    min-width: 650px;
-    min-height: 300px;
+    min-width: 750px;
+    min-height: 350px;
     margin: 20px;
     background: green;
 }

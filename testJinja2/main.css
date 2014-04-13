@@ -5,7 +5,7 @@
 }
 
 body {
-    background: rgb(50,50,50);
+    background: rgb(30,30,30);
     color:rgb(150,150,150);
     font-family: Arial;
 }
@@ -25,8 +25,8 @@ body {
     min-height: 65px;
     min-width: 65px;
     border-radius: 5px;
-    -webkit-transition: all 1s;
-    transition: all 1s;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
 }
 
 .quick-link:hover {
@@ -37,6 +37,7 @@ body {
     left: 40%;
     min-width: 250px;
     min-height: 250px;
+    z-index: 2;
 }
 
 .full-screen {
@@ -44,16 +45,16 @@ body {
     height: 100%;
     background: rgba(100, 100, 100, 0.6);
     position: fixed;
-    left: 0px;
     display: none;
+    z-index: 1;
 }
 
 /**/
 
 #content {
-    margin-top: 20px;
     width: 80%;
-    min-height: 650px;
+    min-height: 700px;
+    border-top-right-radius: 35px;
 }
 
 header {
@@ -95,20 +96,35 @@ header p {
 
 
 nav {
-    min-height: 50px;
+    height: 60px;
     width: 80%;
+    overflow: hidden;
 }
 
 nav ul {
     padding: 0;
 }
 
+
+.link-home {
+    background: rgb(100, 60, 60);
+}
+
+.link-blog {
+    background: rgb(100, 100, 50);
+}
+
+.link-about {
+    background: rgb(20, 30, 100);
+}
+
 nav ul li {
     position: relative;
     display: inline-block;
-    margin: 10px;
     padding: 15px;
     width: 150px;
+    text-align: center;
+    float: left;
 }
 
 nav ul li a {
