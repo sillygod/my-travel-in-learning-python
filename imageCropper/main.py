@@ -89,11 +89,7 @@ class App:
         self.control = Controller(App.action.eventType)
 
         self.btn.setAction(
-            lambda: pygame.image.save(self.previewPic, 'test.png'))
-        # @App.action.connect
-        # def onKeyDown(key):
-        #     if key == K_s:
-        #         pygame.image.save(self.previewPic, 'test.png')
+            lambda: pygame.image.save(self.previewPic.getSurface(), 'test.png'))
 
     def update(self):
         self.crop.update()
@@ -216,18 +212,18 @@ class render:
 
         '''
         self._hdc.fill(widget.bgColor, widget.rect)
-        if(isinstance(widget.border['top'], pygame.Rect)):
+        if(isinstance(widget.borderRect['top'], pygame.Rect)):
             pygame.draw.rect(
-                self._hdc, widget.border['color'], widget.border['top'])
-        if(isinstance(widget.border['left'], pygame.Rect)):
+                self._hdc, widget.border['color'], widget.borderRect['top'])
+        if(isinstance(widget.borderRect['left'], pygame.Rect)):
             pygame.draw.rect(
-                self._hdc, widget.border['color'], widget.border['left'])
-        if(isinstance(widget.border['right'], pygame.Rect)):
+                self._hdc, widget.border['color'], widget.borderRect['left'])
+        if(isinstance(widget.borderRect['right'], pygame.Rect)):
             pygame.draw.rect(
-                self._hdc, widget.border['color'], widget.border['right'])
-        if(isinstance(widget.border['bottom'], pygame.Rect)):
+                self._hdc, widget.border['color'], widget.borderRect['right'])
+        if(isinstance(widget.borderRect['bottom'], pygame.Rect)):
             pygame.draw.rect(
-                self._hdc, widget.border['color'], widget.border['bottom'])
+                self._hdc, widget.border['color'], widget.borderRect['bottom'])
 
         for c in widget.content.values():
             self._hdc.blit(*c)  # unpack
@@ -262,6 +258,8 @@ class widget:
         self.bgColor = kwargs.get('bgColor', (0, 0, 0))
         self.border = kwargs.get(
             'border', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0, 'color': (0, 0, 0)})
+        self.borderRect = {'top': 0, 'left': 0, 'right': 0, 'bottom': 0}
+
         self.padding = kwargs.get(
             'padding', {'top': 0, 'left': 0, 'right': 0, 'bottom': 0})
         self.margin = kwargs.get(
@@ -269,6 +267,10 @@ class widget:
         self.content = {}  # ex. [img, x, y]
 
         self.setBorder()
+
+    def resize(self, width, height):
+        self.rect.width, self.rect.height = width, height
+        self.setBorder()  # reset border
 
     def move(self, x, y):
         '''update the all Rect's position if call move func '''
@@ -280,26 +282,26 @@ class widget:
     def setBorder(self):
         bdWidth = self.border['top']
         if bdWidth > 0:
-            self.border['top'] = pygame.Rect(
+            self.borderRect['top'] = pygame.Rect(
                 self.rect.x - bdWidth, self.rect.y - bdWidth, self.rect.width + 2 * bdWidth, bdWidth)
         bdWidth = self.border['left']
         if bdWidth > 0:
-            self.border['left'] = pygame.Rect(
+            self.borderRect['left'] = pygame.Rect(
                 self.rect.x - bdWidth, self.rect.y, bdWidth, self.rect.height)
         bdWidth = self.border['right']
         if bdWidth > 0:
-            self.border['right'] = pygame.Rect(
+            self.borderRect['right'] = pygame.Rect(
                 self.rect.right, self.rect.y, bdWidth, self.rect.height)
         bdWidth = self.border['bottom']
         if bdWidth > 0:
-            self.border['bottom'] = pygame.Rect(
+            self.borderRect['bottom'] = pygame.Rect(
                 self.rect.x - bdWidth, self.rect.bottom, self.rect.width + 2 * bdWidth, bdWidth)
 
     def isPosIn(self, pos):
         return self.rect.collidepoint(pos)
 
     def update(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class wImage(widget):
@@ -316,7 +318,7 @@ class wImage(widget):
             self.resize(self.rect.width, self.rect.height)
 
     def resize(self, width, height):
-        self.rect.width, self.rect.height = width, height
+        super().resize(width, height)
         self.resize_img = pygame.transform.scale(
             self.img, (self.rect.width, self.rect.height))
 
@@ -329,6 +331,9 @@ class wImage(widget):
     def copyFromImg(self, image):
         self.img = image
         self.resize(self.rect.width, self.rect.height)
+
+    def getSurface(self):
+        return self.resize_img
 
 
 class Window:
@@ -426,7 +431,7 @@ class cropRect(widget):
         def onMouseMove():
             pos = pygame.mouse.get_pos()
             delpos = pygame.mouse.get_rel()
-            #offset coordinate
+            # offset coordinate
             pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
             if self.isInBorder(pos):
                 self.cursor.setCursor('resize_H')
@@ -439,15 +444,15 @@ class cropRect(widget):
                 self.crop.move(*delpos)
                 self.updateCrop()
             if self.resizeable:
-                self.crop.resize(self.crop.rect.width+delpos[0],
-                                 self.crop.rect.height+delpos[1])
+                self.crop.resize(self.crop.rect.width + delpos[0],
+                                 self.crop.rect.height + delpos[1])
                 self.updateCrop()
 
         @App.action.connect
         def onMouseButtonDown():
             pos = pygame.mouse.get_pos()
             pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
-            #offset coordinate
+            # offset coordinate
             if self.isInBorder(pos):
                 self.resizeable = True
             elif self.crop.isPosIn(pos):
@@ -459,18 +464,20 @@ class cropRect(widget):
             self.resizeable = False
 
     def isInBorder(self, pos):
-        for key in self.crop.border:
-            if key != 'color' and self.crop.border[key].collidepoint(pos):
+        for key in self.crop.borderRect:
+            if key != 'color' and self.crop.borderRect[key].collidepoint(pos):
                 return True
         return False
 
     def loadImg(self, fname):
         self.img = wImage(
             fname, x=0, y=0, width=self.rect.width, height=self.rect.height)
-        self.displayImg = wImage(x=0, y=0, width=self.rect.width, height=self.rect.height)
+        self.displayImg = wImage(
+            x=0, y=0, width=self.rect.width, height=self.rect.height)
         self.updateCrop()
 
     def updateCrop(self):
+        forceInside(pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
         self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
         self.displayImg.copyFromImg(self.img.resize_img)
         self.displayImg.setAlpha(120)

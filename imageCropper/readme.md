@@ -1,13 +1,14 @@
-# Environment: python 3.2 , pygame
+`Environment: python 3.2 , pygame`
 
 
 Intention:
-
+----------
  - learn pygame and be familiar with it
  - due to pygame has nothing about gui widgets, I need to implement them myself.
  - now, everything is just a test..
 
 structure:
+----------
 
  - class App
 
@@ -30,4 +31,16 @@ structure:
     basic class for gui element
 
  - class Button
+
+    can bind key or mouse click
+
+
+#think note
+
+```
+    maybe, it should have an object for the layout of all widget.
+    a need for coordinate system?
+    try to add more widget. ex. listbox, scrollbar
+
+```
 
