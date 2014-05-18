@@ -77,11 +77,15 @@ class App:
         self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
 
         self.render = render(self.realBG)
-        self.btn = Button(x=20, y=340, width=100, height=100,
+        self.btn = Button(x=20, y=400, width=100, height=100,
                           border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)})
         self.btn.text = 'save'
 
-        self.crop = cropRect(x=20, y=20, width=300, height=300)
+        self.title = Label(x=20, y=10, width=300, height=30,
+                           border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)})
+        self.title.text = 'This is an image cropper'
+
+        self.crop = cropRect(x=20, y=50, width=300, height=300)
         self.crop.loadImg('World.png')
 
         self.previewPic = wImage(x=400, y=50, width=150, height=150)
@@ -101,6 +105,7 @@ class App:
         self.render.render(self.crop)
         self.render.render(self.previewPic)
         self.render.render(self.btn)
+        self.render.render(self.title)
         self.screen.blit(self.realBG, (0, 0))
         pygame.display.update()
 
@@ -402,12 +407,41 @@ class Button(widget):
 class Label(widget):
 
     '''
-        FUNC:
+    FUNC:
+        show a brief string
 
+    note:
+        maybe it needs a object responsible for
+        font's position and size
     '''
 
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, text=None, **kwargs):
+        super().__init__(**kwargs)
+        if text is not None:
+            self.text = text
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        self._text = value
+        font = SysFont('consola', 30)
+        self._font = font.render(self._text, True, (255, 0, 0))
+        self.content['font'] = [self._font, (
+            self.rect.centerx - self._font.get_width() / 2,
+            self.rect.centery - self._font.get_height() / 2)]
+
+
+class ListBox(widget):
+
+    '''
+    contain a list of label?
+    '''
+
+    def __init__(self, valueList, **kwargs):
+        self._list = [Label(text) for text in valueList if isinstance(text, str)]
 
 
 class cropRect(widget):
@@ -477,7 +511,8 @@ class cropRect(widget):
         self.updateCrop()
 
     def updateCrop(self):
-        forceInside(pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
+        forceInside(
+            pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
         self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
         self.displayImg.copyFromImg(self.img.resize_img)
         self.displayImg.setAlpha(120)

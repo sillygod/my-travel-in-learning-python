@@ -34,6 +34,10 @@ structure:
 
     can bind key or mouse click
 
+ - class Label
+
+    show a brief string
+
 
 #think note
 
@@ -41,6 +45,9 @@ structure:
     maybe, it should have an object for the layout of all widget.
     a need for coordinate system?
     try to add more widget. ex. listbox, scrollbar
+
+    a class responsible for font's size and position
+
 
 ```
 
