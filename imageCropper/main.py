@@ -68,55 +68,36 @@ class Controller:
 
 class App:
 
+    '''
+    specify a flow control, every program should inherite this class to
+    run.
+    '''
+
     action = Action()
 
     def __init__(self, width, height):
+        '''
+        initial a pygame display
+        '''
         pygame.init()
-        self.screen = pygame.display.set_mode((width, height))
-
-        self.realBG = pygame.Surface((width, height), pygame.SRCALPHA)
-
-        self.render = render(self.realBG)
-        self.btn = Button(x=20, y=400, width=100, height=100,
-                          border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)})
-        self.btn.text = 'save'
-
-        self.title = Label(x=20, y=10, width=300, height=30,
-                           border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)})
-        self.title.text = 'This is an image cropper'
-
-        self.crop = cropRect(x=20, y=50, width=300, height=300)
-        self.crop.loadImg('World.png')
-
-        self.previewPic = wImage(x=400, y=50, width=150, height=150)
-
+        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE, 32)
+        self.render = render(self.screen)
         self.control = Controller(App.action.eventType)
 
-        self.btn.setAction(
-            lambda: pygame.image.save(self.previewPic.getSurface(), 'test.png'))
-
     def update(self):
-        self.crop.update()
-        self.previewPic.copyFromImg(self.crop.retCropImg())
-        self.btn.update()
+        raise NotImplementedError
 
     def present(self):
-        self.realBG.fill((0, 0, 0))
-        self.render.render(self.crop)
-        self.render.render(self.previewPic)
-        self.render.render(self.btn)
-        self.render.render(self.title)
-        self.screen.blit(self.realBG, (0, 0))
-        pygame.display.update()
+        raise NotImplementedError
 
     def run(self):
-
         timer = pygame.time.Clock()
         while True:
             timer.tick(30)
             self.control.start(pygame.event.get())
             self.update()
             self.present()
+            pygame.display.update()
 
 
 class Cursor:
@@ -278,7 +259,7 @@ class widget:
         self.setBorder()  # reset border
 
     def move(self, x, y):
-        '''update the all Rect's position if call move func '''
+        '''update the all Rect's position'''
         self.rect.move_ip(x, y)
         for key in self.border:
             if key != 'color' and isinstance(self.border[key], pygame.Rect):
@@ -366,7 +347,7 @@ class Button(widget):
         super().__init__(**kwargs)
         self._state = ''
         self._style = {
-            'in': (105, 20, 20, 10), 'out': (50, 50, 55, 10), 'press': (255, 0, 0)}
+            'in': (100, 150, 55, 20), 'out': (100, 150, 55, 0), 'press': (100, 50, 100)}
 
         self._text = ''
         self._action = None  # a function object
@@ -417,6 +398,7 @@ class Label(widget):
 
     def __init__(self, text=None, **kwargs):
         super().__init__(**kwargs)
+        self.font_size = kwargs.get('font_size', 20)
         if text is not None:
             self.text = text
 
@@ -427,7 +409,7 @@ class Label(widget):
     @text.setter
     def text(self, value):
         self._text = value
-        font = SysFont('consola', 30)
+        font = SysFont('consola', self.font_size)
         self._font = font.render(self._text, True, (255, 0, 0))
         self.content['font'] = [self._font, (
             self.rect.centerx - self._font.get_width() / 2,
@@ -438,96 +420,156 @@ class ListBox(widget):
 
     '''
     contain a list of label?
+
+    ------------  after click ------------
+    |content|\/|      =>      |content|\/|
+    ------------              |content   |
+                              |content   |
+                              |content   |
+                              ......
+                              ---------
+
     '''
 
     def __init__(self, valueList, **kwargs):
         self._list = [Label(text) for text in valueList if isinstance(text, str)]
 
+    def expand(self):
+        pass
 
-class cropRect(widget):
+    def collapse(self):
+        pass
+
+
+class inputLabel(widget):
+
+    '''
+    '''
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.img = None
-        self.displayImg = None
-        self.cursor = Cursor()
-        self.crop = wImage(x=50, y=50, width=150, height=150,
-                           border={'top': 3, 'left': 3, 'right': 3, 'bottom': 3, 'color': (30, 30, 30)})
-        self.hdc = pygame.Surface(
-            (self.rect.width, self.rect.height), pygame.SRCALPHA)
+        pass
 
-        self._render = render(self.hdc)  # inner render for std widget
 
-        self.moveable = False
-        self.resizeable = False
+def main():
+    class MyApp(App):
 
-        @App.action.connect
-        def onMouseMove():
-            pos = pygame.mouse.get_pos()
-            delpos = pygame.mouse.get_rel()
-            # offset coordinate
-            pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
-            if self.isInBorder(pos):
-                self.cursor.setCursor('resize_H')
-            elif self.crop.isPosIn(pos):
-                self.cursor.setCursor('move')
-            else:
-                self.cursor.setCursor('arrow')
+        '''
+        '''
+        def __init__(self, width, height):
+            super().__init__(width, height)
+            self.btn = Button(x=20, y=400, width=100, height=100,
+                              border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)})
+            self.btn.text = 'save'
 
-            if self.moveable:
-                self.crop.move(*delpos)
-                self.updateCrop()
-            if self.resizeable:
-                self.crop.resize(self.crop.rect.width + delpos[0],
-                                 self.crop.rect.height + delpos[1])
-                self.updateCrop()
+            self.title = Label('This is a imageCropper', x=200, y=10, width=300, height=30,
+                               border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)})
 
-        @App.action.connect
-        def onMouseButtonDown():
-            pos = pygame.mouse.get_pos()
-            pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
-            # offset coordinate
-            if self.isInBorder(pos):
-                self.resizeable = True
-            elif self.crop.isPosIn(pos):
-                self.moveable = True
+            self.crop = cropRect(x=200, y=50, width=300, height=300)
+            self.crop.loadImg('World.png')
 
-        @App.action.connect
-        def onMouseButtonUP():
+            self.previewPic = wImage(x=600, y=50, width=150, height=150)
+
+            self.btn.setAction(
+                lambda: pygame.image.save(self.previewPic.getSurface(), 'test.png'))
+
+        def update(self):
+            self.crop.update()
+            self.previewPic.copyFromImg(self.crop.retCropImg())
+            self.btn.update()
+
+        def present(self):
+            self.render.render(self.crop)
+            self.render.render(self.previewPic)
+            self.render.render(self.btn)
+            self.render.render(self.title)
+
+
+    class cropRect(widget):
+
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.img = None
+            self.displayImg = None
+            self.cursor = Cursor()
+            self.crop = wImage(x=50, y=50, width=150, height=150,
+                               border={'top': 3, 'left': 3, 'right': 3, 'bottom': 3, 'color': (30, 30, 30)})
+            self.hdc = pygame.Surface(
+                (self.rect.width, self.rect.height), pygame.SRCALPHA)
+
+            self._render = render(self.hdc)  # inner render for std widget
+
             self.moveable = False
             self.resizeable = False
 
-    def isInBorder(self, pos):
-        for key in self.crop.borderRect:
-            if key != 'color' and self.crop.borderRect[key].collidepoint(pos):
-                return True
-        return False
+            @App.action.connect
+            def onMouseMove():
+                pos = pygame.mouse.get_pos()
+                delpos = pygame.mouse.get_rel()
+                # offset coordinate
+                pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
+                if self.isInBorder(pos):
+                    self.cursor.setCursor('resize_H')
+                elif self.crop.isPosIn(pos):
+                    self.cursor.setCursor('move')
+                else:
+                    self.cursor.setCursor('arrow')
 
-    def loadImg(self, fname):
-        self.img = wImage(
-            fname, x=0, y=0, width=self.rect.width, height=self.rect.height)
-        self.displayImg = wImage(
-            x=0, y=0, width=self.rect.width, height=self.rect.height)
-        self.updateCrop()
+                if self.moveable:
+                    self.crop.move(*delpos)
+                    self.updateCrop()
+                if self.resizeable:
+                    self.crop.resize(self.crop.rect.width + delpos[0],
+                                     self.crop.rect.height + delpos[1])
+                    self.updateCrop()
 
-    def updateCrop(self):
-        forceInside(
-            pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
-        self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
-        self.displayImg.copyFromImg(self.img.resize_img)
-        self.displayImg.setAlpha(120)
+            @App.action.connect
+            def onMouseButtonDown():
+                pos = pygame.mouse.get_pos()
+                pos = (pos[0] - self.rect.x, pos[1] - self.rect.y)
+                # offset coordinate
+                if self.isInBorder(pos):
+                    self.resizeable = True
+                elif self.crop.isPosIn(pos):
+                    self.moveable = True
 
-    def retCropImg(self):
-        '''return a crop Image '''
-        return self.crop.resize_img
+            @App.action.connect
+            def onMouseButtonUP():
+                self.moveable = False
+                self.resizeable = False
 
-    def update(self):
-        self.hdc.fill((0, 0, 0))  # well, note this haha
-        self._render.render(self.displayImg)
-        self._render.render(self.crop)
-        self.content['surface'] = [self.hdc, (self.rect.x, self.rect.y)]
+        def isInBorder(self, pos):
+            for key in self.crop.borderRect:
+                if key != 'color' and self.crop.borderRect[key].collidepoint(pos):
+                    return True
+            return False
+
+        def loadImg(self, fname):
+            self.img = wImage(
+                fname, x=0, y=0, width=self.rect.width, height=self.rect.height)
+            self.displayImg = wImage(
+                x=0, y=0, width=self.rect.width, height=self.rect.height)
+            self.updateCrop()
+
+        def updateCrop(self):
+            forceInside(
+                pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
+            self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
+            self.displayImg.copyFromImg(self.img.resize_img)
+            self.displayImg.setAlpha(120)
+
+        def retCropImg(self):
+            '''return a crop Image '''
+            return self.crop.resize_img
+
+        def update(self):
+            self.hdc.fill((0, 0, 0))  # well, note this haha
+            self._render.render(self.displayImg)
+            self._render.render(self.crop)
+            self.content['surface'] = [self.hdc, (self.rect.x, self.rect.y)]
+
+    obj = MyApp(860, 640)
+    obj.run()
 
 
 if __name__ == "__main__":
-    obj = App(860, 640)
-    obj.run()
+    main()
