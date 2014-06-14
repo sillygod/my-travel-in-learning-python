@@ -96,6 +96,7 @@ class App:
             timer.tick(30)
             self.control.start(pygame.event.get())
             self.update()
+            self.screen.fill((0, 0, 0))
             self.present()
             pygame.display.update()
 
@@ -197,7 +198,9 @@ class render:
             top and bottom border add extra length to fill that.
 
         '''
-        self._hdc.fill(widget.bgColor, widget.rect)
+        canvas = pygame.Surface((widget.rect.width, widget.rect.height), pygame.SRCALPHA)
+        canvas.fill(widget.bgColor, pygame.Rect(0, 0, widget.rect.width, widget.rect.height))
+
         if(isinstance(widget.borderRect['top'], pygame.Rect)):
             pygame.draw.rect(
                 self._hdc, widget.border['color'], widget.borderRect['top'])
@@ -210,6 +213,8 @@ class render:
         if(isinstance(widget.borderRect['bottom'], pygame.Rect)):
             pygame.draw.rect(
                 self._hdc, widget.border['color'], widget.borderRect['bottom'])
+
+        self._hdc.blit(canvas, (widget.rect.x, widget.rect.y))
 
         for c in widget.content.values():
             self._hdc.blit(*c)  # unpack
@@ -346,8 +351,11 @@ class Button(widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._state = ''
+
         self._style = {
-            'in': (100, 150, 55, 20), 'out': (100, 150, 55, 0), 'press': (100, 50, 100)}
+            'in': kwargs.get('mouse_in', (255, 150, 55)),
+            'out': kwargs.get('mouse_out', (255, 150, 55, 100)),
+            'press': kwargs.get('mouse_press', (100, 50, 100))}
 
         self._text = ''
         self._action = None  # a function object
@@ -458,11 +466,15 @@ def main():
         def __init__(self, width, height):
             super().__init__(width, height)
             self.btn = Button(x=20, y=400, width=100, height=100,
-                              border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)})
+                              border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)},
+                              mouse_in=(50, 100, 123),
+                              mouse_out=(50, 100, 123, 100),
+                              mouse_press=(50, 100, 103))
             self.btn.text = 'save'
 
             self.title = Label('This is a imageCropper', x=200, y=10, width=300, height=30,
-                               border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)})
+                               border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)},
+                               bgColor=(125, 20, 80))
 
             self.crop = cropRect(x=200, y=50, width=300, height=300)
             self.crop.loadImg('World.png')
