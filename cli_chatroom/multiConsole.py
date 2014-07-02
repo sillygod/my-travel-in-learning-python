@@ -33,6 +33,7 @@ import inspect
 
 def myDebugMsg(msg=''):
     print('{}   at:{}'.format(msg, inspect.stack()[1][1:3]))
+    input()
 
 
 def pause():
@@ -61,7 +62,12 @@ class CONSOLE_CURSOR_INFO(ctypes.Structure):
 
 
 PCHAR_INFO = ctypes.POINTER(CHAR_INFO)
-COORD = wintypes._COORD
+# COORD = wintypes._COORD
+
+class COORD(wintypes._COORD):
+
+    def __str__(self):
+        return 'x={}, y={}'.format( super().X, super().Y )
 #---------------------------------------------------
 
 
@@ -72,25 +78,29 @@ class dllLoader:
     '''
 
     def __init__(self):
-        self.mKernel32 = ctypes.WinDLL('Kernel32.dll')
-        self.mUser32 = ctypes.WinDLL('User32.dll')
-        self.mGdi32 = ctypes.WinDLL('Gdi32.dll')
+        self._lib = {}
 
-    def getKernel32(self):
-        return self.mKernel32
-
-    def getUser32(self):
-        return self.mUser32
-
-    def getGdi32(self):
-        return self.mGdi32
-
-    Kernel32 = property(getKernel32)
-    User32 = property(getUser32)
-    Gdi32 = property(getGdi32)
+    def load(self, dll):
+        dname = dll.__name__
+        self._lib[dname] = ctypes.WinDLL(dll())
+        return self._lib[dname]
 
 
 dll = dllLoader()
+
+@dll.load
+def Kernel32():
+    return 'Kernel32.dll'
+
+@dll.load
+def User32():
+    return 'User32.dll'
+
+@dll.load
+def Gdi32():
+    return 'Gdi32.dll'
+
+# print(Kernel32)
 
 #-------------------------------------------------------
 
@@ -98,7 +108,7 @@ dll = dllLoader()
 class consoleBackBuffer:
 
     def __init__(self, w, h):
-        self.mstdout = dll.Kernel32.CreateConsoleScreenBuffer(
+        self.mstdout = Kernel32.CreateConsoleScreenBuffer(
             0x80000000 | 0x40000000,  # generic read and write
             0x00000001 | 0x00000002,
             None,
@@ -112,7 +122,7 @@ class consoleBackBuffer:
 
         self.coordBufSize = COORD(w, h)
 
-        dll.Kernel32.SetConsoleScreenBufferSize(self.mstdout, self.coordBufSize)
+        Kernel32.SetConsoleScreenBufferSize(self.mstdout, self.coordBufSize)
 
         self.coordBufCoord = COORD(0, 0)
 
@@ -125,27 +135,27 @@ class consoleBackBuffer:
 
     def setCursorVisibility(self, flag=False):
         self.cursorInfo.bVisible = flag
-        dll.Kernel32.SetConsoleCursorInfo(
+        Kernel32.SetConsoleCursorInfo(
             self.mstdout, ctypes.byref(self.cursorInfo))
 
     def toggleActiveConsole(self, stdout=None):
         if stdout is not None:
-            dll.Kernel32.SetConsoleActiveScreenBuffer(stdout)
+            Kernel32.SetConsoleActiveScreenBuffer(stdout)
         else:
-            dll.Kernel32.SetConsoleActiveScreenBuffer(self.mstdout)
+            Kernel32.SetConsoleActiveScreenBuffer(self.mstdout)
 
     def getHandle(self):
         return self.mstdout
 
     def set_color(self, color):
-        dll.Kernel32.SetConsoleTextAttribute(self.mstdout, color)
+        Kernel32.SetConsoleTextAttribute(self.mstdout, color)
 
     def gotoxy(self, x, y, stdout=None):
         coord = COORD(x, y)
         if stdout is None:
-            dll.Kernel32.SetConsoleCursorPosition(self.mstdout, coord)
+            Kernel32.SetConsoleCursorPosition(self.mstdout, coord)
         else:
-            dll.Kernel32.SetConsoleCursorPosition(stdout, coord)
+            Kernel32.SetConsoleCursorPosition(stdout, coord)
 
     def setWriteSrc(self, x, y):
         self.writeRgn.Top = y
@@ -153,40 +163,38 @@ class consoleBackBuffer:
         self.writeRgn.Right = x + self.coordBufSize.X - 1
         self.writeRgn.Bottom = y + self.coordBufSize.Y - 1
 
+    def textwrap(self, str, width):
+        '''
+            return a wrapped string
+            this will split the string if it exceed the length of width
+            ex. textwrap('hhhhhhh', 5)
+            return r'hhhhh\nhh\n'
+        '''
+        strLst = []
+        while len(str) > width:
+            strLst.append(str[:width-1])
+            str = str[width-1:]
+
+        strLst.append(str)
+        return '\n'.join(strLst)+'\n'
+
     def write(self, msg):
-        while len(msg) > self.coordBufSize.X:
+        msg = self.textwrap(msg, self.coordBufSize.X)
+        success = Kernel32.WriteConsoleW(
+            self.mstdout,
+            msg,
+            DWORD(len(msg)),
+            ctypes.byref(self.actuallyWritten),
+            None)
 
-            tempMsg = msg[:self.coordBufSize.X - 1] + '\n'
-            msg = msg[self.coordBufSize.X - 1:]
-
-            success = dll.Kernel32.WriteConsoleW(
-                self.mstdout,
-                tempMsg,
-                DWORD(len(tempMsg)),
-                ctypes.byref(self.actuallyWritten),
-                None)
-
-            if success == 0:
-                myDebugMsg('WriteConsoleW failed')
-
-        if '\n' not in msg:
-            msg = msg + '\n'
-
-        if len(msg) != 0:
-            success = dll.Kernel32.WriteConsoleW(
-                self.mstdout,
-                msg,
-                DWORD(len(msg)),
-                ctypes.byref(self.actuallyWritten),
-                None)
-
-            if success == 0:
-                myDebugMsg('WriteConsoleW failed')
+        if success == 0:
+            myDebugMsg('WriteConsoleW failed')
 
     def present(self, mainBuffer):
         chiBuffer = (CHAR_INFO * (self.coordBufSize.X * self.coordBufSize.Y))()
+        # the chiBuffer has different limited size according to heap size
 
-        success = dll.Kernel32.ReadConsoleOutputW(
+        success = Kernel32.ReadConsoleOutputW(
             self.mstdout,
             ctypes.byref(chiBuffer),
             self.coordBufSize,
@@ -197,7 +205,7 @@ class consoleBackBuffer:
         if success == 0:
             myDebugMsg('ReadConsoleOutputW failed')
 
-        success = dll.Kernel32.WriteConsoleOutputW(
+        success = Kernel32.WriteConsoleOutputW(
             mainBuffer,
             ctypes.byref(chiBuffer),
             self.coordBufSize,
@@ -295,8 +303,8 @@ class msgroom(widget):
             self.scroll = 0
 
     def detectPageUpAndDown(self):
-        pageUP = dll.User32.GetAsyncKeyState(0x21)
-        pageDown = dll.User32.GetAsyncKeyState(0x22)
+        pageUP = User32.GetAsyncKeyState(0x21)
+        pageDown = User32.GetAsyncKeyState(0x22)
 
         if pageUP != 0:
             self.scrollContent(-2)
@@ -358,6 +366,16 @@ class inputLabel(widget):
         self.console.gotoxy(0, 0)
 
 
+def resizeConsoleWindow(hstdout,  width, height):
+    hwnd = Kernel32.GetConsoleWindow()
+    size = COORD(width//8+1, height//16+1)
+    # by default, the font size in console is 8*16
+    rc = SMALL_RECT(0, 0, width//8+1, height//16+1)
+    Kernel32.SetConsoleScreenBufferSize(hstdout, size)
+    Kernel32.SetConsoleWindowInfo(hstdout, 1, ctypes.byref(rc))
+    User32.MoveWindow(hwnd, 0, 0, 790, 690, 1)
+
+
 def test():
     '''
     there is a way to resize the console buffer...
@@ -365,19 +383,16 @@ def test():
     '''
     from threading import Timer, Thread
 
-    hstdout = dll.Kernel32.GetStdHandle(DWORD(-11))
-    hwnd = dll.Kernel32.GetConsoleWindow()
+    hstdout = Kernel32.GetStdHandle(DWORD(-11))
     if(hstdout == HANDLE(-1)):
         print('create buffer failed')
-    # size = COORD(490//8+1, 690//16+1)
-    # rc = SMALL_RECT(0, 0, 490//8, 690//16)
-    # dll.Kernel32.SetConsoleWindowInfo(hstdout, 1, ctypes.byref(rc))
-    # dll.Kernel32.SetConsoleScreenBufferSize(hstdout, size)
-    # hrgn = dll.Gdi32.CreateRectRgn(20, 20, size.X, size.Y)
-    # dll.User32.SetWindowRgn(hwnd, hrgn, 1)
 
 
-    backBuffer = consoleBackBuffer(80, 25)
+    width = 790
+    height = 690
+    resizeConsoleWindow(hstdout, width, height)
+
+    backBuffer = consoleBackBuffer(180, 80)
 
     userpanel = usermenu(56, 0, 15, 17)
     userpanel.title = 'user list'

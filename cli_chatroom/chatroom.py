@@ -44,12 +44,16 @@ class cmdPresenter(bufferPresenter):
     def __init__(self):
         self.panel = {}  # contain each widget
 
-        self.hstdout = dll.Kernel32.GetStdHandle(DWORD(-11))
+        self.hstdout = Kernel32.GetStdHandle(DWORD(-11))
 
         if(self.hstdout == HANDLE(-1)):
             print('create buffer failed')
 
-        self.backBuffer = consoleBackBuffer(80, 18)
+        width = 760
+        height = 690
+        resizeConsoleWindow(self.hstdout, width, height)
+        self.backBuffer = consoleBackBuffer(width//8, height//16)
+
 
         self.panel['userpanel'] = usermenu(56, 0, 15, 17)
         self.panel['chatroom'] = msgroom(0, 0, 55, 17)
@@ -57,6 +61,7 @@ class cmdPresenter(bufferPresenter):
 
         self.panel['userpanel'].title = 'user list'
         self.panel['chatroom'].title = 'chat room'
+
 
         self.backBuffer.gotoxy(1, 19, self.hstdout)  # the cursor pos for input
 
@@ -231,21 +236,19 @@ class server(baseSocket):
             for obj in self.connAndAddr:
                 obj[0].sendall(
                     pickle.dumps((self.panel['userpanel'].getContent(), self.panel['chatroom'].getContent())))
-            time.sleep(0.05)
+            time.sleep(0.1)
 
     def process(self, conn):
         while True:
             try:
                 data = conn.recv(4096)
             except:
-                print('error or client closed')
-                for i in range(len(self.connAndAddr)):
-                    if conn in self.connAndAddr[i]:
-                        self.panel['userpanel'].delContent(
-                            self.connAndAddr[i][2])
-                        self.panel['chatroom'].addContent(
-                            self.connAndAddr[i][2] + ' leave...')
-                        self.connAndAddr.pop(i)
+                # this happens when the client disconnect.
+                for index, obj in enumerate(self.connAndAddr):
+                    if conn in obj:
+                        self.panel['userpanel'].delContent(obj[2])
+                        self.panel['chatroom'].addContent(obj[2]+' leave...')
+                        self.connAndAddr.pop(index)
                         break
 
                 conn.close()
@@ -253,8 +256,6 @@ class server(baseSocket):
 
             self.panel['chatroom'].addContent(data.decode('utf-8'))
 
-            # for obj in self.connAndAddr:
-            # obj[0].sendall(pickle.dumps(self.panel['chatroom'].getContent()))
         conn.close()
 
 
