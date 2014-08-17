@@ -98,8 +98,7 @@ def resizeConsoleWindow(hstdout,  width, height):
 
     print('font size:{} {}'.format(cfont_info.dwFontSize.X, cfont_info.dwFontSize.Y))
     print('screen buffer size:{} {}'.format(cscreen_info.dwSize.X, cscreen_info.dwSize.Y))
-    size = COORD(max(width // cfont_info.dwFontSize.X, cscreen_info.dwSize.X),
-                 max(height // cfont_info.dwFontSize.Y, cscreen_info.dwSize.Y))
+    size = COORD(width // cfont_info.dwFontSize.X, height // cfont_info.dwFontSize.Y)
     print(size)
     # by default, the font size in console is 8*16
     # bx = User32.GetSystemMetrics(5)  # CXBORDER
