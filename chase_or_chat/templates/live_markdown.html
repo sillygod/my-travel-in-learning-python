@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>live markdown</title>
+    {% load staticfiles %}
+    <script src="{% static "jquery.js" %}"></script>
+    <link href="/static/md_std.css" rel="stylesheet">
+    <style>
+        .table{
+            margin: 0 auto;
+            width: 1280px;
+            height: 768px;
+        }
+
+
+        .edit{
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: 0px;
+        }
+
+        .preview{
+            width: 600px;
+            border: solid 5px rgb(30, 40, 100);
+            float: left;
+            height: 100%;
+            border-radius: 5px 5px;
+            padding: 5px;
+        }
+
+        .textwrapper{
+            width: 50%;
+            height: 100%;
+            border: solid 5px rgb(30, 40, 100);
+            float: left;
+            margin-right: 10px;
+            border-radius: 5px 5px;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- {{ data|default:"3 &lt; 2" }} -->
+    <div class='table'>
+        <div class='textwrapper'>
+            <textarea class='edit'></textarea>
+        </div>
+        <div class='preview'>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script>
+(function($){
+
+    function load_md(data){
+        //load the html outputed by markdown module
+        if(data != '' && data != 'undefined')
+        {
+            $('.preview').html(data);
+        }
+    }
+
+    function sendContent(){
+        //send the content of textarea to server
+        var state;
+
+        $.ajax({
+            type: "POST",
+            url: "/pro_markdown/",
+            data: {'context': $('.edit').val()},
+            dataType: "text",
+            success: function(data){
+                load_md(data);
+            }
+        })
+    }
+
+    // setInterval(sendContent, 1000);
+    $('.edit').bind('input change', function(){
+        sendContent();
+    })
+})(jQuery);
+</script>
