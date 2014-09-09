@@ -14,6 +14,7 @@ from threading import Thread
 import msvcrt
 import time
 from multiConsole import *
+from console import *
 import pickle
 
 
@@ -51,8 +52,8 @@ class cmdPresenter(bufferPresenter):
 
         width = 760
         height = 690
-        resizeConsoleWindow(self.hstdout, width, height)
-        self.backBuffer = consoleBackBuffer(width//8, height//16)
+        # resizeConsoleWindow(self.hstdout, width, height)
+        self.backBuffer = consoleBackBuffer(80, 17)
 
 
         self.panel['userpanel'] = usermenu(56, 0, 15, 17)
@@ -74,6 +75,7 @@ class cmdPresenter(bufferPresenter):
             panel.update()
 
         self.display()
+
 
     def getPanel(self):
         return self.panel
@@ -113,6 +115,7 @@ class cmdPresenter(bufferPresenter):
     def display(self):
         for p in self.updateList:
             if p == self.panel['inLabel']:
+                p.update()
                 p.display(self.hstdout)
                 self.updateList.remove(self.panel['inLabel'])
             else:

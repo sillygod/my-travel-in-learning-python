@@ -1,3 +1,4 @@
+import ctypes
 from ctypes import wintypes
 from ctypes.wintypes import *
 
@@ -129,6 +130,7 @@ class consoleBackBuffer:
         self.cursorInfo.dwSize = 25
 
         self.coordBufSize = COORD(w, h)
+
 
         Kernel32.SetConsoleScreenBufferSize(self.mstdout, self.coordBufSize)
 

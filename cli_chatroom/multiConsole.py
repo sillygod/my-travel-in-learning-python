@@ -25,6 +25,7 @@ import msvcrt
 from console import consoleBackBuffer
 from console import Kernel32
 from console import User32
+from console import resizeConsoleWindow
 import inspect
 
 
@@ -200,7 +201,7 @@ def test():
 
     width = 1024
     height = 690
-    resizeConsoleWindow(hstdout, width, height)
+    # resizeConsoleWindow(hstdout, width, height)
 
     backBuffer = consoleBackBuffer(180, 80)
 

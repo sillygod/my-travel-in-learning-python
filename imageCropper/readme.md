@@ -39,6 +39,12 @@ structure:
     show a brief string
 
 
+
+preview
+---
+![preview](http://i.imgur.com/UZ5Ik41.png)
+
+
 #think note
 
 ```
