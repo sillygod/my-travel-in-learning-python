@@ -1,0 +1,319 @@
+<?xml version='1.0' encoding='utf-8'?>
+<database>
+	<table name='EMPLOYEE'>
+		<data>
+			<Fname>John</Fname>
+			<Minit>B</Minit>
+			<Lname>Smith</Lname>
+			<Ssn key='key'>123456789</Ssn>
+			<Bdate>1965-01-09</Bdate>
+			<Address>731 Fondren, Houston, TX</Address>
+			<Sex>M</Sex>
+			<Salary>30000</Salary>
+			<Super_ssn>333445555</Super_ssn>
+			<Dno>5</Dno>
+		</data>
+		<data>
+			<Fname>Franklin</Fname>
+			<Minit>T</Minit>
+			<Lname>Wong</Lname>
+			<Ssn key='key'>333445555</Ssn>
+			<Bdate>1955-12-08</Bdate>
+			<Address>638 Voss, Houston, TX</Address>
+			<Sex>M</Sex>
+			<Salary>40000</Salary>
+			<Super_ssn>888665555</Super_ssn>
+			<Dno>5</Dno>
+		</data>
+		<data>
+			<Fname>Alicia</Fname>
+			<Minit>J</Minit>
+			<Lname>Zelaya</Lname>
+			<Ssn key='key'>999887777</Ssn>
+			<Bdate>1968-01-19</Bdate>
+			<Address>33321 Castle, Spring, TX</Address>
+			<Sex>F</Sex>
+			<Salary>25000</Salary>
+			<Super_ssn>987654321</Super_ssn>
+			<Dno>4</Dno>
+		</data>
+		<data>
+			<Fname>Jennifer</Fname>
+			<Minit>S</Minit>
+			<Lname>Wallace</Lname>
+			<Ssn key='key'>987654321</Ssn>
+			<Bdate>1941-06-20</Bdate>
+			<Address>291 Berry, Bellaire, TX</Address>
+			<Sex>F</Sex>
+			<Salary>43000</Salary>
+			<Super_ssn>888665555</Super_ssn>
+			<Dno>4</Dno>
+		</data>
+		<data>
+			<Fname>Ramesh</Fname>
+			<Minit>K</Minit>
+			<Lname>Narayan</Lname>
+			<Ssn key='key'>666884444</Ssn>
+			<Bdate>1962-09-15</Bdate>
+			<Address>975 Fire Oak, Humble, TX</Address>
+			<Sex>M</Sex>
+			<Salary>38000</Salary>
+			<Super_ssn>333445555</Super_ssn>
+			<Dno>5</Dno>
+		</data>
+		<data>
+			<Fname>Joyce</Fname>
+			<Minit>A</Minit>
+			<Lname>English</Lname>
+			<Ssn key='key'>453453453</Ssn>
+			<Bdate>1972-07-31</Bdate>
+			<Address>5631 Rice, Houston, TX</Address>
+			<Sex>F</Sex>
+			<Salary>25000</Salary>
+			<Super_ssn>333445555</Super_ssn>
+			<Dno>5</Dno>
+		</data>
+		<data>
+			<Fname>Ahmad</Fname>
+			<Minit>V</Minit>
+			<Lname>Jabbar</Lname>
+			<Ssn key='key'>987987987</Ssn>
+			<Bdate>1969-03-29</Bdate>
+			<Address>980 Dallas, Houston, TX</Address>
+			<Sex>M</Sex>
+			<Salary>25000</Salary>
+			<Super_ssn>987654321</Super_ssn>
+			<Dno>4</Dno>
+		</data>
+		<data>
+			<Fname>James</Fname>
+			<Minit>E</Minit>
+			<Lname>Borg</Lname>
+			<Ssn key='key'>888665555</Ssn>
+			<Bdate>1937-11-10</Bdate>
+			<Address>450 Stone, Houston, TX</Address>
+			<Sex>M</Sex>
+			<Salary>55000</Salary>
+			<Super_ssn>0</Super_ssn>
+			<Dno>1</Dno>
+		</data>
+	</table>
+	
+	<table name='DEPARTMENT'>
+		<data>
+			<Dname>Research</Dname>
+			<Dnumber key='key'>5</Dnumber>
+			<Mgr_ssn>333445555</Mgr_ssn>
+			<Mgr_start_date>1988-05-22</Mgr_start_date>
+		</data>
+		<data>
+			<Dname>Administration</Dname>
+			<Dnumber key='key'>4</Dnumber>
+			<Mgr_ssn>987654321</Mgr_ssn>
+			<Mgr_start_date>1995-01-01</Mgr_start_date>
+		</data>
+		<data>
+			<Dname>Headquarters</Dname>
+			<Dnumber key='key'>1</Dnumber>
+			<Mgr_ssn>888665555</Mgr_ssn>
+			<Mgr_start_date>1981-06-19</Mgr_start_date>
+		</data>
+	</table>
+	
+	<table name='DEPT_LOCATIONS'>
+		<data>
+			<Dnumber key='key'>1</Dnumber>
+			<Dlocation key='key'>Houston</Dlocation>
+		</data>
+		<data>
+			<Dnumber key='key'>4</Dnumber>
+			<Dlocation key='key'>Stafford</Dlocation>
+		</data>
+		<data>
+			<Dnumber key='key'>5</Dnumber>
+			<Dlocation key='key'>Bellaire</Dlocation>
+		</data>
+		<data>
+			<Dnumber key='key'>5</Dnumber>
+			<Dlocation key='key'>Sugarland</Dlocation>
+		</data>
+		<data>
+			<Dnumber key='key'>5</Dnumber>
+			<Dlocation key='key'>Houston</Dlocation>
+		</data>
+	</table>
+	
+	<table name='WORKS_ON'>
+		<data>
+			<Essn key='key'>123456789</Essn>
+			<Pno key='key'>1</Pno>
+			<Hours>32.5</Hours>
+		</data>
+		<data>
+			<Essn key='key'>123456789</Essn>
+			<Pno key='key'>2</Pno>
+			<Hours>7.5</Hours>
+		</data>
+		<data>
+			<Essn key='key'>666884444</Essn>
+			<Pno key='key'>3</Pno>
+			<Hours>40.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>453453453</Essn>
+			<Pno key='key'>1</Pno>
+			<Hours>20.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>453453453</Essn>
+			<Pno key='key'>2</Pno>
+			<Hours>20.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Pno key='key'>2</Pno>
+			<Hours>10.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Pno key='key'>3</Pno>
+			<Hours>10.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Pno key='key'>10</Pno>
+			<Hours>10.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Pno key='key'>20</Pno>
+			<Hours>10.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>999887777</Essn>
+			<Pno key='key'>30</Pno>
+			<Hours>30.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>999887777</Essn>
+			<Pno key='key'>10</Pno>
+			<Hours>10.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>987987987</Essn>
+			<Pno key='key'>10</Pno>
+			<Hours>35.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>987987987</Essn>
+			<Pno key='key'>30</Pno>
+			<Hours>5.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>987654321</Essn>
+			<Pno key='key'>30</Pno>
+			<Hours>20.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>987654321</Essn>
+			<Pno key='key'>20</Pno>
+			<Hours>15.0</Hours>
+		</data>
+		<data>
+			<Essn key='key'>888665555</Essn>
+			<Pno key='key'>20</Pno>
+			<Hours>0</Hours>
+		</data>
+	</table>
+	
+	<table name='PROJECT'>
+		<data>
+			<Pname>ProductX</Pname>
+			<Pnumber key='key'>1</Pnumber>
+			<Plocation>Bellaire</Plocation>
+			<Dnum>5</Dnum>
+		</data>
+		<data>
+			<Pname>ProductY</Pname>
+			<Pnumber key='key'>2</Pnumber>
+			<Plocation>Sugarland</Plocation>
+			<Dnum>5</Dnum>
+		</data>
+		<data>
+			<Pname>ProductZ</Pname>
+			<Pnumber key='key'>3</Pnumber>
+			<Plocation>Houston</Plocation>
+			<Dnum>5</Dnum>
+		</data>
+		<data>
+			<Pname>Computerization</Pname>
+			<Pnumber key='key'>10</Pnumber>
+			<Plocation>Stafford</Plocation>
+			<Dnum>4</Dnum>
+		</data>
+		<data>
+			<Pname>Reorganization</Pname>
+			<Pnumber key='key'>20</Pnumber>
+			<Plocation>Houston</Plocation>
+			<Dnum>1</Dnum>
+		</data>
+		<data>
+			<Pname>Newbenefits</Pname>
+			<Pnumber key='key'>30</Pnumber>
+			<Plocation>Stafford</Plocation>
+			<Dnum>4</Dnum>
+		</data>
+	</table>
+	
+	<table name='DEPENDENT'>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Dependent_name key='key'>Alice</Dependent_name>
+			<Sex>F</Sex>
+			<Bdate>1986-04-05</Bdate>
+			<Relationship>Daughter</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Dependent_name key='key'>Theodore</Dependent_name>
+			<Sex>M</Sex>
+			<Bdate>1983-10-25</Bdate>
+			<Relationship>Son</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>333445555</Essn>
+			<Dependent_name key='key'>Joy</Dependent_name>
+			<Sex>F</Sex>
+			<Bdate>1958-05-03</Bdate>
+			<Relationship>Spouse</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>987654321</Essn>
+			<Dependent_name key='key'>Abner</Dependent_name>
+			<Sex>M</Sex>
+			<Bdate>1942-02-28</Bdate>
+			<Relationship>Spouse</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>123456789</Essn>
+			<Dependent_name key='key'>Michael</Dependent_name>
+			<Sex>M</Sex>
+			<Bdate>1988-01-04</Bdate>
+			<Relationship>Son</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>123456789</Essn>
+			<Dependent_name key='key'>Alice</Dependent_name>
+			<Sex>F</Sex>
+			<Bdate>1988-12-30</Bdate>
+			<Relationship>Daughter</Relationship>
+		</data>
+		<data>
+			<Essn key='key'>123456789</Essn>
+			<Dependent_name key='key'>Elizabeth</Dependent_name>
+			<Sex>F</Sex>
+			<Bdate>1967-05-05</Bdate>
+			<Relationship>Spouse</Relationship>
+		</data>
+	</table>
+</database>
