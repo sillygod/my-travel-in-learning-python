@@ -1,0 +1,170 @@
+cpu Atom Z3745 (1.33GHz/1.86GHz Intel Burst Technology)
+screen 10.1吋 IPS技術/1366x768
+ram 2GB LPDDR3 (不可擴充)
+hardware 64GB eMMC
+顯示晶片 Intel HD Graphics
+軟體 Windows 8.1(32bit)
+重量  585g(pad only)/1.17kg(pad/dock)
+
+cpu Intel Atom Bay Trail-T Z3740 1.33四核心
+screen 10.1吋 IPS面板HD 觸控螢幕
+ram DDR3 2GB
+hardware 設備：EMMC 64G
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu Intel Celeron N2830
+screen 14" 鏡面寬螢幕(LED)
+ram 4GB DDRIII
+hardware 500GB (5400rpm)
+無線網路 802.11 b/g/n
+光碟機 DVD Super Multi (DL)
+作業系統 64 Bits Windows 8.1
+其他 HDMI、HD 攝影機、USB 3.0
+
+cpu Core i5-4210U(1.7GHz/ 2.7GHz)
+screen 15.6吋 霧面螢幕(LED背光)
+ram 1x 4GB DDR3L 1600
+hardware 1TB
+軟體 Windows 8.1 家用中文版
+網路 802.11b/g/n
+其他 獨立數字鍵盤
+獨立顯卡 NVIDIA GeForce 820M
+
+cpu 四核心 A4-5000 1.55GHz
+screen 14.0" 鏡面寬螢幕 (LED)
+ram 4GB DDRIIIL
+hardware 750G
+無線網路 802.11bgn
+光碟機 DVD-Super Multi (DL)
+顯示晶片 AMD HD 8670 獨顯1G
+作業系統 無
+其他 USB 3.0、HD 攝影機、HDMI、藍芽4.0
+
+cpu Intel Core i5-4200H 2.8GHz
+screen 15.6"FHD (1920*1080)
+ram 4GB DDRIII 1600
+hardware 1TB 5400轉
+無線網路 802.11ac、藍芽4.0
+光碟機 DVD-Super Multi (DL)
+作業系統 64 Bits Windows 8.1
+其他 HDMI、USB 3.0、HD 攝影機
+獨立顯卡 Nvidia GeForce GTX 850M 獨顯2G
+
+cpu Intel 2020M 2.4GHz /2M
+screen 17.3" HD+(1600x900)
+ram 4GB*1 DDRIII 1600 on board
+hardware 500G (5400rpm)
+無線網路 802.11 bgn
+光碟機 DVD Super Multi (DL)
+作業系統 無
+其他 HDMI、30萬畫素視訊、USB 3.0
+獨立顯卡 Nvidia GeForce GT 720M 獨顯2G
+
+cpu Intel Atom Bay Trail-T Z3775 1.46GHz( up to 2.39) 四核心
+screen 10.1吋 IPS面板HD 觸控螢幕
+ram DDR3 2GB
+hardware 設備：EMMC 64GB+ 500G
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu Pentium N3540 (2.16GHz/Burst 2.66GHz)
+screen 13.3" 霧面(LED背光)
+ram 4G DDR3*1
+hardware 500G (SATA)
+軟體 Windows 8.1 家用中文版
+顯示晶片 Intel HD Graphics
+網路 802.11b/g/n
+
+cpu Intel:Core i5-4210M (2.6Ghz / Turbo：3.2GHz)
+screen 15.6"W鏡面 (LED背光)
+ram 4GB DDR3L-1600
+hardware 1000GB
+光碟機 DVD-Super Multi (DL)
+顯示晶片 NVIDIA GeForce 840M - 2G 獨顯
+網路 802.11b/g/n、藍牙BT4.0
+軟體 Windows 8.1 家用中文版
+其他 HDMI、USB3.0
+
+cpu Intel Atom Bay Trail-T Z3775 1.46GHz( up to 2.39) 四核心
+screen 10.1吋 IPS面板HD 觸控螢幕
+ram DDR3 2GB
+hardware 設備：EMMC 64G
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu Intel Atom Bay Trail-T Z3775 1.46GHz( up to 2.39) 四核心
+screen 11.6 "IPS面板 1366*768 16:9 HD Panel
+ram DDR3 2GB
+hardware 設備：EMMC 64GB
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu Intel Core i5-4200U (1.6Ghz / Turbo：2.6G)
+screen 13.3吋FHD IPS 十點觸控LED背光螢幕
+ram 4G DDR3
+hardware 256GB SSD
+無線網路 802.11abgn(Intel 7260)支援WiDi、藍芽4.0
+顯示晶片 Intel HD Graphics 4400
+軟體 Windows 8.1 家用中文版
+其他 USB3.0、EL 背光鍵盤
+
+cpu Intel Atom Bay Trail-T Z3775 1.46GHz( up to 2.39) 四核心
+screen 10.1吋 IPS面板HD 觸控螢幕
+ram DDR3 2GB
+hardware 設備：EMMC 64G
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu AMD A6-1450 Quad Core
+screen 11.6" HD(1366 x 768)觸控
+ram 4G x1 DDR3L 1066
+hardware 容量:500G(5400RPM)
+無線網路 802.11b/g/n
+繪圖晶片  AMD Radeon HD 8250 Graphics
+作業系統 Windows 8.1 (64 bit)
+喇叭/音效技術 DTS Sound+ / Dual Speakers
+售後保固服務 一年國際有限保固
+
+cpu Intel Core i5-4200H 2.8GHz
+screen 15.6" LED 鏡面寬螢幕
+ram 4GB DDRIII 1600
+hardware 1TB 5400轉
+無線網路 802.11n、藍芽4.0
+光碟機 DVD-Super Multi (DL)
+作業系統 64 Bits Windows 8
+其他 HDMI、USB 3.0、HD 攝影機
+獨立顯卡 Nvidia GeForce GT 820M 獨顯2G
+
+cpu Intel Core i5-4210U
+screen 13.3"FHD Touch螢幕(1920*1080)
+ram 4GB DDR3L 1600
+hardware 1TB(5400轉)
+無線網路 802.11ac
+顯示晶片 Nvidia 820M 2G獨顯
+保固 2年全球保固+LCD無亮點保固
+作業系統 64 Bits Windows 8
+重量(公斤)  1.7 KG
+
+cpu Intel Atom Bay Trail-T Z3775 1.46GHz( up to 2.39) 四核心
+screen 10.1吋 IPS面板HD 觸控螢幕
+ram DDR3 2GB
+hardware 設備：EMMC 64GB+ 500G
+無線網路 802.11a/b/g/n, Bluetooth V4.0
+作業系統 Window 8.1
+其他 Micro USB、USB 3.0、Micro HDMI
+
+cpu 四核心 A4-5000 1.55GHz
+screen 15.6" 鏡面寬螢幕 (LED)
+ram 4GB DDR3L
+hardware 750G
+無線網路 802.11bgn
+光碟機 DVD-Super Multi (DL)
+作業系統 64 Bits Windows 8
+其他 USB 3.0、HD 攝影機、HDMI、藍芽4.0
+

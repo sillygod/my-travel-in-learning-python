@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.fullscreen {
+    width: 9999px;
+    height: 100%;
+    background: rgba(100, 100, 100, 0.6);
+    position: fixed;
+    display: none;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+}
+
+.pop-up {
+    display: none;
+    z-index: 2;
+    margin: 0 auto;
+    position: absolute;
+    width: 780px;
+    height: 400px;
+    background: rgba(17, 15, 13, 1);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.pop-up span {
+    margin: 5px;
+    display: inline-block;
+}
+
+.pop-up img {
+    width: 330px;
+    height: 300px;
+    margin-top: 50px;
+}
+
+.popcont {
+    float: right;
+    width: 440px;
+    margin-top: 45px;
+}
+
+.popcont div {
+    margin: 3px;
+    color: rgb(100, 100, 100);
+    font-size: 14px;
+}
+
+.popimg {
+    float: left;
+}
+
+.specName {
+    font-size: 15px;
+    color: red;
+}
+
+</style>
+
+<div class='fullscreen'></div>
+<div class='pop-up'>
+    <div class='popcont'>
+    </div>
+    <div class='popimg'>
+    </div>
+</div>
+
+<form method="post">
+        <input type="text" name="q">
+        <input type="submit" value="Search">
+</form>
+
+{% if prods %}
+    {% for prod in prods %}
+    <div class="photo">
+        <div class="heading">
+            <span>{{ prod.title }}</span>
+        </div>
+        <img src="{{ prod.picture }}" width="350" height="233" alt="" />
+
+        <div id='spec' style="display: hidden">
+            <div><span class='specName'>Url:</span><span>{{ prod.url }}</span></div>
+            <div><span class='specName'>Title:</span><span>{{ prod.title }}</span></div>
+            <div><span class='specName'>Cpu:</span><span>{{ prod.cpu }}</span></div>
+            <div><span class='specName'>Ram:</span><span>{{ prod.ram }}</span></div>
+            <div><span class='specName'>Hardware:</span><span>{{ prod.hardware }}</span></div>
+            <div><span class='specName'>Screen:</span><span>{{ prod.screen }}</span></div>
+            <div><span class='specName'>Else_spec:</span><span>{{ prod.else_spec}}</span></div>
+        </div>
+
+        <div class="caption">
+            <span>價錢: {{ prod.price }}</span>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script>
+    var width = screen.width;
+    var height = screen.height;
+
+    $('.fullscreen').on('click', function(event){
+        $('.pop-up').css('display', 'none');
+        $(this).css('display', 'none');
+
+        $('.pop-up').children('div:first').empty();
+        $('.pop-up').children('div:last').empty();
+    })
+
+    $('.photo').on('click', function(event){
+
+        //event.preventDefault();
+        var _img = $(this).children('img');
+        content = $(this).children('#spec').html();
+
+        var _show = $('.pop-up');
+
+        _show.children('div:first').html(content);
+        _show.children('div:last').append( $('<img>').attr('src', _img.attr('src')) );
+        //adjust the pos
+
+        _show.css('display', 'block');
+
+        _w = $('.pop-up').width();
+        _h = $('.pop-up').height();
+
+        console.log(width);
+        console.log(_w);
+
+        _show.offset({'left': (width - _w)/2,
+                      'top': (height - _h)/2});
+
+        $('.fullscreen').css('display', 'block');
+
+    });
+
+</script>
+{% endblock %}

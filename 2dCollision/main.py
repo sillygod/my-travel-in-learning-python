@@ -1,4 +1,3 @@
-#!usr/bin/python3
 '''
     find some concept tutorial site
     http://www.euclideanspace.com/physics/dynamics/collision/twod/
@@ -24,7 +23,12 @@
 '''
 
 import pygame
-import pygame._view  # well this line for cx_feeze...
+
+try:
+    import pygame._view  # well this line for cx_feeze...
+except:
+    pass
+
 from pygame.locals import *
 import pygame.time
 import sys

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+{% if prods %}
+    {% for prod in prods %}
+    <div class="photo">
+        <div class="heading">
+            <span>{{ prod.prod.title }}</span>
+        </div>
+        <img src="{{ prod.prod.picture }}" width="350" height="233" alt="" />
+        <div class="caption">
+            {% if prod.state %}
+            <span style='color:rgba(35, 152, 57, 1)'> 已加入 </span>
+            {% else %}
+            <span> 未加入 </span>
+            <div class='add_data' site='{{ prod.prod.url}}'>加入資料庫</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}

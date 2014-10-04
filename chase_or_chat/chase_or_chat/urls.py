@@ -26,6 +26,14 @@ urlpatterns = patterns('books.views',
     url(r'^admin/', include(admin.site.urls)),
 )
 
+urlpatterns += patterns('data_grabber.views',
+    url(r'^add_to_db/$', 'add_to_db'),
+    url(r'^add_prod/(?P<page>\d*)/$', 'add_prod'),
+    url(r'^add_prod/$', 'add_prod'),
+    url(r'^show_prod/$', 'show_prod'),
+    url(r'^show_prod/(?P<page>\d*)/$', 'show_prod'),
+)
+
 urlpatterns += patterns('chase_or_chat.views',
     url(r'^meta/', 'meta_display'),
 )

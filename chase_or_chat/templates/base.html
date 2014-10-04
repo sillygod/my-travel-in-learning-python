@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>My PChome</title>
+    {% load staticfiles %}
+    <script src="{% static "jquery.js" %}"></script>
+    <script src="{% static "jquery.easing.1.3.js" %}"></script>
+
+    <script>
+    $(document).ready(function () {
+
+        // transition effect
+        style = 'easeOutQuart';
+
+        // if the mouse hover the image
+        $('.photo').hover(
+            function() {
+                //display heading and caption
+                $(this).children('div:first').stop(false,true).animate({top:0},{duration:200, easing: style});
+                $(this).children('div:last').stop(false,true).animate({bottom:0},{duration:200, easing: style});
+            },
+
+            function() {
+                //hide heading and caption
+                $(this).children('div:first').stop(false,true).animate({top:-50},{duration:200, easing: style});
+                $(this).children('div:last').stop(false,true).animate({bottom:-50},{duration:200, easing: style});
+            }
+        );
+
+        //bind event to add data
+        $('.add_data').on('click', function(event){
+            event.preventDefault();
+            console.log('shit');
+            var _this = $(this);
+            $.ajax({
+                type: 'POST',
+                url: '/add_to_db/',
+                data: {'site': $(this).attr('site') },
+                success: function(data){
+                    _this.prev().css('color', 'rgba(35, 152, 57, 1)').html('已加入');
+                    _this.remove();
+                }
+            })
+
+        });
+
+        function parseURL(url){
+            page = /(.*\/)([_\w]+)/.exec(url);
+            latter_site = /.*\/([_\w]+)/.exec(page[1]);
+
+            page = Number( page[2] );
+            if( isNaN(page) ){
+                page = 1;
+            }
+
+            return {'page': page, 'site': latter_site[1]};
+        }
+
+
+        $('.jssora01l').on('click', function(event){
+            event.preventDefault();
+            url = document.URL;
+
+            info = parseURL(url);
+            page = info['page'];
+
+            page = page - 1;
+            if(page < 1){
+                page = 1;
+            }
+            location.href = '/'+info['site']+'/'+page+'/';
+        });
+
+        $('.jssora01r').on('click', function(event){
+            event.preventDefault();
+            url = document.URL;
+            info = parseURL(url);
+            page = info['page'];
+            page = page + 1;
+            location.href = '/'+info['site']+'/'+page+'/';
+        });
+
+
+    });
+    </script>
+    <style>
+
+    body {
+        background: url('/static/back.jpg');
+    }
+
+    #container {
+        margin: 0 auto;
+        width: 1200px;
+        position: relative;
+        top: 120px;
+    }
+
+    .photo {
+        position:relative;
+        font-family:arial;
+        overflow:hidden;
+        border:5px solid #000;
+        border-radius: 10px;
+        width:350px;
+        height:233px;
+        float: left;
+        margin: 5px;
+    }
+
+        .photo .heading, .photo .caption {
+            position:absolute;
+            background:#000;
+            height:50px;
+            width:350px;
+            opacity:0.8;
+        }
+
+        .photo .heading {
+            top:-50px;
+        }
+
+        .photo .caption {
+            bottom:-50px;
+            left:0px;
+            color: #56c3e5;
+            font-size:16px;
+        }
+
+        .photo .heading span {
+            color:rgb(38, 195, 229);
+            top:-50px;
+            font-weight:bold;
+            display:block;
+            padding:5px 0 0 10px;
+            font-size: 12px;
+        }
+
+        .photo .caption span{
+            color: red;
+            display:inline-block;
+            padding:5px;
+            margin: 13px;
+        }
+
+        .add_data {
+            background: rgba(36, 33, 27, 0.7);
+            display: inline-block;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            margin: 13px;
+            padding: 5px;
+            color: rgb(227, 76, 27);
+            border-radius: 10px;
+        }
+
+        #add_data:hover {
+            background: rgba(36, 33, 27, 1);
+        }
+
+    </style>
+</head>
+<body>
+
+<div id='container'>
+    {% block content %}
+        <span>go for implement</span>
+    {% endblock %}
+
+    <!-- Arrow Navigator Skin Begin -->
+    <style>
+        /* jssor slider arrow navigator skin 01 css */
+        /*
+        .jssora01l              (normal)
+        .jssora01r              (normal)
+        .jssora01l:hover        (normal mouseover)
+        .jssora01r:hover        (normal mouseover)
+        .jssora01ldn            (mousedown)
+        .jssora01rdn            (mousedown)
+        */
+        .jssora01l, .jssora01r, .jssora01ldn, .jssora01rdn
+        {
+            position: absolute;
+            cursor: pointer;
+            display: block;
+            background: url(/static/a01.png) no-repeat;
+            overflow:hidden;
+        }
+        .jssora01l { background-position: -8px -38px; }
+        .jssora01r { background-position: -68px -38px; }
+        .jssora01l:hover { background-position: -128px -38px; }
+        .jssora01r:hover { background-position: -188px -38px; }
+        .jssora01ldn { background-position: -8px -38px; }
+        .jssora01rdn { background-position: -68px -38px; }
+    </style>
+    <!-- Arrow Left -->
+    <span u="arrowleft" class="jssora01l" style="width: 45px; height: 45px; top: 230px; left: -45px;">
+    </span>
+    <!-- Arrow Right -->
+    <span u="arrowright" class="jssora01r" style="width: 45px; height: 45px; top: 230px; right: 45px">
+    </span>
+
+    <footer>Powered by sillygod</footer>
+</div>
+</body>
+</html>
+
+{% block script %}
+{% endblock %}
