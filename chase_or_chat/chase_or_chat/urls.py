@@ -30,8 +30,9 @@ urlpatterns += patterns('data_grabber.views',
     url(r'^add_to_db/$', 'add_to_db'),
     url(r'^add_prod/(?P<page>\d*)/$', 'add_prod'),
     url(r'^add_prod/$', 'add_prod'),
-    url(r'^show_prod/$', 'show_prod'),
+    url(r'^home/$', 'show_home'),
     url(r'^show_prod/(?P<page>\d*)/$', 'show_prod'),
+    url(r'^search/$', 'search'),
 )
 
 urlpatterns += patterns('chase_or_chat.views',

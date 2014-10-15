@@ -8,7 +8,9 @@ python 3.2
 
 >now, this is just on plan.
 1. small django app can be logged in with facebook account or other.
+
 2. small html5 game
+
 3. chat room system
 
 
