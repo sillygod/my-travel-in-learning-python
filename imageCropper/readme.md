@@ -1,14 +1,13 @@
 `Environment: python 3.2 , pygame`
 
 
-Intention:
-----------
+# Intention
+
  - learn pygame and be familiar with it
  - due to pygame has nothing about gui widgets, I need to implement them myself.
  - now, everything is just a test..
 
-structure:
-----------
+# structure
 
  - class App
 
@@ -40,19 +39,19 @@ structure:
 
 
 
-preview
----
+# preview
+
 ![preview](http://i.imgur.com/UZ5Ik41.png)
 
 
 #think note
 
 ```
-    maybe, it should have an object for the layout of all widget.
-    a need for coordinate system?
-    try to add more widget. ex. listbox, scrollbar
+maybe, it should have an object for the layout of all widget.
+a need for coordinate system?
+try to add more widget. ex. listbox, scrollbar
 
-    a class responsible for font's size and position
+a class responsible for font's size and position
 
 
 ```
