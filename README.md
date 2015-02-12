@@ -18,7 +18,7 @@ In order to learning python, I think some projects to implement and try hard to 
 # projecct-list
 
  - 2d collision
- - chase_or_chat
+ - django_zoo
  - cli_chatroom
  - imageCropper
  - imageDisplayer
@@ -47,7 +47,7 @@ everything you need just `pip install`
 implement 2d vector by pure python and by c++. Try to compare the efficiency between the vector implement by python and implement by c++
 
 
-### chase_or_chat
+### django_zoo
 
 now, everything is just a practice due to lots of thing needed to learn
 

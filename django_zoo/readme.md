@@ -22,23 +22,23 @@ It is a **good** habit to named the url pattern.
 their structure follow the rule below
 
 ```
-    static
-        app1/
-            css/
-            js/
-            img/
-            ..
-        app2/
-            css/
-            js/
-            img/
-            ,,
+static
+    app1/
+        css/
+        js/
+        img/
+        ..
+    app2/
+        css/
+        js/
+        img/
+        ,,
 
-    templates/
-        app1/
-            xxx.html
-            ..
-        app2/
-            ...
-            .
+templates/
+    app1/
+        xxx.html
+        ..
+    app2/
+        ...
+        .
 ```
