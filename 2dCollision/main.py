@@ -22,6 +22,8 @@
     intend: a snow animation
 '''
 
+from __future__ import division
+# __future__ must be at the beginning of file
 import pygame
 
 try:
@@ -36,7 +38,7 @@ import math
 import random
 
 
-class Vector:
+class Vector(object):
 
     def __init__(self, x=0.0, y=0.0):
         self.x = x
@@ -50,6 +52,10 @@ class Vector:
         ''' ex. -Vector(2,2) -> Vector(-2,-2)'''
         return Vector(-self.x, -self.y)
 
+    def __eq__(self, rhs):
+        ''' for comparison two vector is the same or not '''
+        return (self.x == rhs.x) and (self.y == rhs.y)
+
     # def __del__(self):
     #   print('vector {} is delete'.format(self.point))
 
@@ -62,10 +68,15 @@ class Vector:
     def __add__(self, rhs):
         return Vector(self.x + rhs.x, self.y + rhs.y)
 
-    def __truediv__(self, rhs):
+    def __div__(self, rhs):
         if isinstance(rhs, Vector):
             raise ValueError
         return Vector(self.x / rhs, self.y / rhs)
+
+    def __truediv__(self, rhs):
+        if isinstance(rhs, Vector):
+            raise ValueError
+        return Vector(self.x // rhs, self.y // rhs)
 
     def __mul__(self, rhs):
         ''' rhs is a pure num '''
@@ -167,7 +178,7 @@ class Vector:
             raise ValueError
 
 
-class Circle:
+class Circle(object):
 
     def __init__(self, x, y, r):
         ''' public data '''
@@ -189,7 +200,7 @@ class Circle:
         return False
 
 
-class Rect:
+class Rect(object):
 
     def __init__(self, x, y, width, height):
         self.x = x
@@ -198,7 +209,7 @@ class Rect:
         self.height = height
 
 
-class Particle:
+class Particle(object):
 
     def __init__(self, x=0, y=0, vx=0.0, vy=0.0, size=0, mass=1):
         self.velocity = Vector(vx, vy)
@@ -273,7 +284,7 @@ class Particle:
         self.boundCircle.pos += (self.velocity * dt)
 
 
-class Enviromment:
+class Enviromment(object):
 
     '''
         boundregion should be set here
@@ -336,7 +347,7 @@ class Enviromment:
         self._boundRegion = Rect(*value)
 
 
-class App:
+class App(object):
 
     def __init__(self, width, height):
         pygame.init()

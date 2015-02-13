@@ -4,6 +4,8 @@ import os
 import re
 import json
 import abc
+import random
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -46,7 +48,7 @@ class web_grabber:
     def __init__(self, site=''):
         self._site = site
         self._headers = {
-            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+            'User-Agent': 'Mozilla/4.0'+str(random.randrange(1000000))}
         self._content = None
 
     def set_site(self, site):
