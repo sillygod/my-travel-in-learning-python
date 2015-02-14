@@ -27,20 +27,20 @@ float Vector::length()
     return sqrtf(x*x+y*y+z*z);
 }
 
-void Vector::print()
-{
-    cout<<"<"<<x<<","<<y<<","<<z<<">"<<endl;
-}
+// void Vector::print()
+// {
+//     cout<<"<"<<x<<","<<y<<","<<z<<">"<<endl;
+// }
 
-void Vector::input()
-{
-    cout<<"\nEnter x";
-    cin>>x;
-    cout<<"\nEnter y";
-    cin>>y;
-    cout<<"\nEnter z";
-    cin>>z;
-}
+// void Vector::input()
+// {
+//     cout<<"\nEnter x";
+//     cin>>x;
+//     cout<<"\nEnter y";
+//     cin>>y;
+//     cout<<"\nEnter z";
+//     cin>>z;
+// }
 
 void Vector::normalize()
 {
@@ -88,10 +88,10 @@ float Vector:: operator*(const Vector&v2)
     return dot;
 }
 
-Vector:: operator float*()
-{
-    return &x;
-}
+// Vector:: operator float*()
+// {
+//     return &x;
+// }
 
 bool Vector:: operator!=(const Vector& v2)
 {
@@ -103,20 +103,20 @@ bool Vector:: operator==(const Vector& v2)
     return x==v2.x && y==v2.y && z==v2.z;
 }
 
-std::istream& operator>>(std::istream& is, Vector& v2)
-{
-    cout<<"\nEnter x";
-    cin >> v2.x;
-    cout<<"\nEnter y";
-    cin >> v2.y;
-    cout<<"\nEnter z";
-    cin >> v2.z;
+// std::istream& operator>>(std::istream& is, Vector& v2)
+// {
+//     cout<<"\nEnter x";
+//     cin >> v2.x;
+//     cout<<"\nEnter y";
+//     cin >> v2.y;
+//     cout<<"\nEnter z";
+//     cin >> v2.z;
 
-    return is;
-}
+//     return is;
+// }
 
-std::ostream& operator<<(std::ostream& os, const Vector& v2)
-{
-    cout<<"<"<<v2.x<<","<<v2.y<<","<<v2.z<<">\n";
-    return os;
-}
+// std::ostream& operator<<(std::ostream& os, const Vector& v2)
+// {
+//     cout<<"<"<<v2.x<<","<<v2.y<<","<<v2.z<<">\n";
+//     return os;
+// }
