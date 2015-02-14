@@ -103,7 +103,7 @@ bool Vector:: operator==(const Vector& v2)
     return x==v2.x && y==v2.y && z==v2.z;
 }
 
-std::istream& operator>>(std::istream& is, Vector& v2)//這地方Vector用const會有問題喔 & must be written
+std::istream& operator>>(std::istream& is, Vector& v2)
 {
     cout<<"\nEnter x";
     cin >> v2.x;
