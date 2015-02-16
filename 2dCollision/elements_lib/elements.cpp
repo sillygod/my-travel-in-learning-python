@@ -1,25 +1,25 @@
-//vector.cpp
+//object.cpp
 
-#include "vector.h"
+#include "elements.h"
 #include <cmath>
-#include <iostream>
-using namespace std;
+// #include <iostream>
+// using namespace std;
 
 
 Vector:: Vector()
+:x(0), y(0), z(0)
 {
-    x=0; y=0; z=0;
 }
 
 
 Vector:: Vector(float mx, float my, float mz)
+:x(mx), y(my), z(mz)
 {
-    x=mx; y=my; z=mz;
 }
 
 Vector:: Vector(float coords[3])
+:x(coords[0]), y(coords[1]), z(coords[2])
 {
-    x=coords[0]; y=coords[1]; z=coords[2];
 }
 
 float Vector::length()
@@ -120,3 +120,30 @@ bool Vector:: operator==(const Vector& v2)
 //     cout<<"<"<<v2.x<<","<<v2.y<<","<<v2.z<<">\n";
 //     return os;
 // }
+
+Circle::Circle()
+:pos(Vector(0, 0, 0)), radius(0.0)
+{
+}
+
+
+Circle::Circle(float x, float y, float r)
+:pos(Vector(x, y, 0)), radius(r)
+{
+}
+
+
+bool Circle::isCollision(Circle& c)
+{
+    Vector v = c.pos - pos;
+
+    if(v.length() < radius + c.radius)
+    {
+        // collision then, adjust the position to make no overlapped
+        v.normalize();
+        c.pos = pos + v*(radius+c.radius);
+        return true;
+    }
+
+    return false;
+}

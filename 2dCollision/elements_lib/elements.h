@@ -1,10 +1,10 @@
 //vector.h
 
 
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef ELEMENTS_H
+#define ELEMENTS_H
 
-#include <iostream>
+// #include <iostream>
 
 //because this class data is often used, put the data in the public
 
@@ -60,5 +60,21 @@ public:
 //
 // std::istream& operator>>(std::istream& is, Vector& v2);
 // std::ostream& operator<<(std::ostream& os,const Vector& v2);
+
+
+class Circle
+{
+public:
+
+    Circle();
+    Circle(float x, float y, float r);
+
+    bool isCollision(Circle& c);
+
+
+    Vector pos;
+    float radius;
+};
+
 
 #endif

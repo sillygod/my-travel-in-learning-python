@@ -4,9 +4,8 @@
 # Do not make changes to this file unless you know what you are doing--modify
 # the SWIG interface file instead.
 
-
-
-
+from __future__ import division
+import math
 
 from sys import version_info
 if version_info >= (2, 6, 0):
@@ -15,7 +14,8 @@ if version_info >= (2, 6, 0):
         import imp
         fp = None
         try:
-            fp, pathname, description = imp.find_module('_vector', [dirname(__file__)])
+            fp, pathname, description = imp.find_module(
+                '_vector', [dirname(__file__)])
         except ImportError:
             import _vector
             return _vector
@@ -70,6 +70,7 @@ def _swig_getattr_nondynamic(self, class_type, name, static=1):
     else:
         raise AttributeError(name)
 
+
 def _swig_getattr(self, class_type, name):
     return _swig_getattr_nondynamic(self, class_type, name, 0)
 
@@ -92,7 +93,8 @@ except AttributeError:
 
 class Vector(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Vector, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(
+        self, Vector, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, Vector, name)
     __repr__ = _swig_repr
@@ -116,11 +118,22 @@ class Vector(_object):
         except:
             self.this = this
 
-    def length(self):
-        return _vector.Vector_length(self)
+    def __call__(self):
+        """ return an int tuple"""
+        if math.isnan(self.x):
+            return (0, 0)
 
-    def normalize(self):
-        return _vector.Vector_normalize(self)
+        return (int(self.x), int(self.y))
+
+    def __neg__(self):
+        """ negative a vector """
+        return Vector(-self.x, -self.y)
+
+    def __getitem__(self, value):
+        return Vector.__getattr__(self, value)
+
+    def __setitem__(self, index, value):
+        Vector.__setattr__(self, index, value)
 
     def __str__(self):
         return 'Vector x={} y={} z={}'.format(self.x, self.y, self.z)
@@ -131,19 +144,64 @@ class Vector(_object):
     def __sub__(self, v2):
         return _vector.Vector___sub__(self, v2)
 
+    def __rmul__(self, *args):
+        return _vector.Vector___mul__(self, *args)
+
     def __mul__(self, *args):
         return _vector.Vector___mul__(self, *args)
+
+    def __div__(self, rhs):
+        return _vector.Vector___mul__(self, 1/rhs)
 
     def __ne__(self, v2):
         return _vector.Vector___ne__(self, v2)
 
     def __eq__(self, v2):
         return _vector.Vector___eq__(self, v2)
+
+    @property
+    def point(self):
+        return (self.x, self.y)
+
+    @point.setter
+    def point(self, value):
+        self.x = value[0]
+        self.y = value[1]
+
+    @property
+    def angle(self):
+        """ return radian  """
+        try:
+            return math.atan(self.y/self.x)
+        except:
+            return math.pi/2
+
+    def reflect(self, normal):
+        """
+        """
+        I = self
+        self = (2*(-I.dot(normal))*normal)+I
+        return self
+
+    def length(self):
+        return _vector.Vector_length(self)
+
+    def dot(self, v2):
+        return _vector.Vector___mul__(self, v2)
+
+    def normalize(self):
+        v = Vector(self.x, self.y, self.z)
+        _vector.Vector_normalize(v)
+        return v
+
+    def rotate(self, radius):
+        newx = self.x * math.cos(radius) - self.y * math.sin(radius)
+        newy = self.x * math.sin(radius) + self.y * math.cos(radius)
+        return Vector(newx, newy)
+
     __swig_destroy__ = _vector.delete_Vector
     __del__ = lambda self: None
 Vector_swigregister = _vector.Vector_swigregister
 Vector_swigregister(Vector)
 
 # This file is compatible with both classic and new-style classes.
-
-
