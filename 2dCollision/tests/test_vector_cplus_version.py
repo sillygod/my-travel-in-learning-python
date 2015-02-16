@@ -1,6 +1,6 @@
 import unittest
-from elements import Vector
-from elements import Circle
+from elements_lib.cElements import Vector
+from elements_lib.cElements import Circle
 
 
 class TestVector(unittest.TestCase):

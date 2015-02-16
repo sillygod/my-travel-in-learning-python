@@ -36,8 +36,8 @@ import pygame.time
 import sys
 import math
 import random
-from elements_lib.pyelements import Vector, Circle
-# from elements_lib.elements import Vector, Circle
+# from elements_lib.pyelements import Vector, Circle
+from elements_lib.cElements import Vector, Circle
 
 
 class Rect(object):

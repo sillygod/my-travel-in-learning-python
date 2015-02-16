@@ -1,77 +1,8 @@
+from __future__ import division
 import unittest
-from main import Vector
 from main import Enviromment
-
-
-class testVector(unittest.TestCase):
-
-    """test function of vector
-    """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_neg_vector(self):
-
-        res = -Vector(2, 2)
-        self.assertEqual(-2, res['x'])
-        self.assertEqual(-2, res['y'])
-
-    def test_add_vector(self):
-
-        v1 = Vector(2, 3)
-        v2 = Vector(1, 2)
-
-        res = v1 + v2
-        self.assertEqual(res, Vector(3, 5))
-
-    def test_sub_vector(self):
-
-        v1 = Vector(3, 3)
-        v2 = Vector(1, 1)
-
-        self.assertEqual(Vector(2, 2), v1 - v2)
-
-    def test_scale_vector(self):
-        """here, we test for division and multiplication
-        """
-        v1 = Vector(1, 1)
-        v2 = Vector(5, 5)
-        v3 = v2 / 2
-
-        self.assertEqual(v1 * 5, v2)
-        self.assertEqual(v1, v2 / 5)
-        self.assertEqual(v3, Vector(2.5, 2.5))
-
-    # below start to test in place calculations
-    def test_iadd_vector(self):
-
-        v1 = Vector(2, 2)
-        v2 = Vector(3, 3)
-        v1 += v2
-
-        self.assertEqual(v1, Vector(5, 5))
-
-    def test_isub_vector(self):
-
-        v1 = Vector(5, 5)
-        v2 = Vector(2, 2)
-
-        v1 -= v2
-
-        self.assertEqual(v1, Vector(3, 3))
-
-    def test_inplace_scale_vector(self):
-
-        v1 = Vector(2, 2)
-        v1 *= 2
-
-        self.assertEqual(v1, Vector(4, 4))
-        v1 /= 2
-        self.assertEqual(v1, Vector(2, 2))
+from main import Particle
+from elements_lib.cElements import Vector
 
 
 class testEnvironment(unittest.TestCase):
@@ -90,3 +21,32 @@ class testEnvironment(unittest.TestCase):
         self.assertEqual(0, env.boundregion.y)
         self.assertEqual(200, env.boundregion.width)
         self.assertEqual(200, env.boundregion.height)
+
+
+class testParticle(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_momentum(self):
+        p = Particle(3, 4, 3, 4, 15)
+        self.assertEqual(p.momentum, Vector(3, 4))
+
+    def test_be_clicked(self):
+        p = Particle(3, 4, 3, 4, 15)
+        self.assertTrue(p.isBeClicked(6, 6))
+
+    def test_Kinetic(self):
+        p = Particle(3, 4, 3, 4, 15)
+        self.assertEqual(25/2, p.calKinetic())
+
+    def test_collision(self):
+        """test two particle and check the kinetic whether
+        is the same as the state before collision
+        """
+        pass
+
+
