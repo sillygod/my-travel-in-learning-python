@@ -55,11 +55,13 @@
             var $this = this;
 
             this.callback();
-
-            this.timer = setTimeout(
-                function(){ $this.run(); },
-                1000/this.fps
-            );
+            
+            // In my opinion, using interval is better than settimeout
+            // due to the cancel timer..
+            // you need to check the timer id carefully to cancel it
+            // by settimeout
+            this.timer = setInterval(this.callback, 1000/this.fps);
+            
         },
 
         start: function()
@@ -192,49 +194,47 @@
         //   every value should has the same interface!!
         //   currently, use the dock typing to achieve this function
 
-
-        //function loadSprite(src) {
-        //var deferred = $.Deferred();
-        //var sprite = new Image();
-        //sprite.onload = function() {
-            //deferred.resolve();
-        //};
-        //sprite.src = src;
-        //return deferred.promise();
-        //}
+        //
 
         var deffered = $.Deferred();
 
         this.resList = [];
+        this.isLoaded = [];
 
-        ResourceLoader.prototype.push = function(value){
-            this.resList.push(value);
-        };
-
-
-        ResourceLoader.prototype.init = function(process){
-            //accept a function object, run this function after all the res has been load
-            var load = true;
-            var $this = this;
-
-            for(var i in this.resList){
-                if(this.resList[i].isLoaded() === false){
-                    console.log('still in loading resource..');
-                    load = false;
-                    setTimeout(function(){ $this.init(process); }, 500);
-                    break;
-                }
-                else{
-                    console.log('load..');
-                }
-            }
-
-            if(load){
-                process.start();
-            }
-        };
     }
+    
+    ResourceLoader.prototype.push = function(value){
+        // will push resource state (deferred object)
+        this.resList.push(value);
+        this.isLoaded.push(value.deferred);
+    };
 
+
+    ResourceLoader.prototype.init = function(process){
+        
+        var $this = this;
+
+        var resLoadloop = new Timer({
+            callback: function(){
+                for(var i=0; i<$this.resList.length; i++){
+                    var deferred = $this.resList[i].isLoaded();
+                    console.log(deferred.state());
+                }
+            }
+        });
+        
+        
+        $.when.apply($, $this.isLoaded).progress(function(){
+            console.log('still in loading resource..run check again');
+        }).done(function(){
+            resLoadloop.stop();
+            process.start();
+        });
+
+        resLoadloop.start();
+        
+        
+    };
 
 
     function Sprite(src){
@@ -244,44 +244,52 @@
         this.y = 0;
         this.width = 0;
         this.height = 0;
-
-        Sprite.prototype.load = function(src){
-            // initially, we set the display's height and width are the
-            // same as the picture's
-            this.img.src = src;
-            this.width = this.img.width;
-            this.height = this.img.height;
-        };
-
-
-        Sprite.prototype.setWidthandHeight= function(value){
-            this.width = value.width;
-            this.height = value.height;
-        };
-
-
-        Sprite.prototype.isLoaded = function(){
-            return this.img.complete; //check the img is loaded or not
-        };
-
-
-        Sprite.prototype.draw = function(backBufferDC, sx, sy, x, y){
-            // draw the content to the back buffer
-            // img.complete
-            // maybe, we can set a timer to trigger this...until it show the pic
-            sx = sx || 0;
-            sy = sy || 0;
-            x  = x || 0;
-            y = y || 0;
-
-            backBufferDC.drawImage(this.img, sx, sy, this.width, this.height, x, y, this.width, this.height);
-        };
-
+        this.deferred = $.Deferred();
 
         if(src != 'undefined'){
             this.load(src); //due to this.load defined at runtime... so
         }
     }
+
+    Sprite.prototype.load = function(src){
+        // initially, we set the display's height and width are the
+        // same as the picture's
+        this.img.src = src;
+        this.width = this.img.width;
+        this.height = this.img.height;
+    };
+
+
+    Sprite.prototype.setWidthandHeight= function(value){
+        this.width = value.width;
+        this.height = value.height;
+    };
+
+
+    Sprite.prototype.isLoaded = function(){
+        
+        if(this.img.complete){
+            //check the img is loaded or not
+            this.deferred.resolve(this.img.src+' is loaded');
+        }else{
+            this.deferred.notify('in process');
+        }
+
+        return this.deferred;
+    };
+
+
+    Sprite.prototype.draw = function(backBufferDC, sx, sy, x, y){
+        // draw the content to the back buffer
+        // img.complete
+        // maybe, we can set a timer to trigger this...until it show the pic
+        sx = sx || 0;
+        sy = sy || 0;
+        x  = x || 0;
+        y = y || 0;
+
+        backBufferDC.drawImage(this.img, sx, sy, this.width, this.height, x, y, this.width, this.height);
+    };
 
 
 
@@ -295,74 +303,83 @@
         this.fps = 30;
 
         this.count = 0;
-
+        this.deferred = $.Deferred();
         this.jsonLoaded = false;
 
-
-        animateSprite.prototype.setWidthandHeight = function(value){
-            this.batch.setWidthandHeight(value);
-        };
-
-
-        animateSprite.prototype.isLoaded = function(){
-            console.log(this.batch.isLoaded() && this.jsonLoaded );
-            return this.batch.isLoaded() && this.jsonLoaded;
-        };
-
-
-        animateSprite.prototype.setframes = function(src, name){
-            // load batch file and the points (x, y) of different frame
-            // ex.
-            //     this.setframe('ch.png', [{x: 10, y: 20}])
-            var $this = this;
-            this.batch.load(src);
-
-            //$.each.apply(this.frames, function(value){
-            //    this.frames.push(value);
-            //}, points);
-            $.getJSON("./data.json", function(data){
-                $.each(data[name], function(index, element){
-                    $this.frames.push(element);
-                })
-            }).done(function(){
-                $this.jsonLoaded = true;
-            });
-
-
-
-        };
-
-
-        animateSprite.prototype.draw = function(){
-            // need to think a way of python unpack argument..
-            var sx = this.frames[this.count].x;
-            var sy = this.frames[this.count].y;
-
-            this.batch.draw(this.backBuffer.getDC(), sx, sy, 50, 50);
-        };
-
-
-        animateSprite.prototype.play = function(){
-
-            var $this = this;
-
-            console.log(this.count);
-
-            if(this.count < this.frames.length){
-                this.count++;
-                setTimeout(function(){ $this.play();}, 1000/this.fps);
-                //set timeout with this...
-            }
-            else{
-                    this.count = 0;
-                    console.log('count is '+this.count);
-            }
-
-        };
-
-
-
-
     }
+
+    animateSprite.prototype.setWidthandHeight = function(value){
+        this.batch.setWidthandHeight(value);
+    };
+
+
+    animateSprite.prototype.isLoaded = function(){
+        
+        var $this = this;
+        
+        $.when(this.batch.isLoaded()).done(function(){
+            
+            if($this.jsonLoaded){
+                $this.deferred.resolve('loaded');
+            }else{
+                $this.deferred.notify('process');
+            }
+        });
+        return $this.deferred;
+    };
+
+
+    animateSprite.prototype.setframes = function(src, name){
+        // load batch file and the points (x, y) of different frame
+        // ex.
+        //     this.setframe('ch.png', [{x: 10, y: 20}])
+        var $this = this;
+        this.batch.load(src);
+
+        //$.each.apply(this.frames, function(value){
+        //    this.frames.push(value);
+        //}, points);
+        $.getJSON("./data.json", function(data){
+            
+            $.each(data[name], function(index, element){
+                $this.frames.push(element);
+            });
+            
+        }).done(function(){
+            $this.jsonLoaded = true;
+        });
+
+
+
+    };
+
+
+    animateSprite.prototype.draw = function(){
+        // need to think a way of python unpack argument..
+        var sx = this.frames[this.count].x;
+        var sy = this.frames[this.count].y;
+
+        this.batch.draw(this.backBuffer.getDC(), sx, sy, 50, 50);
+    };
+
+
+    animateSprite.prototype.play = function(){
+
+        var $this = this;
+
+        console.log(this.count);
+
+        if(this.count < this.frames.length){
+            this.count++;
+            setTimeout(function(){ $this.play();}, 1000/this.fps);
+            //set timeout with this...
+        }
+        else{
+                this.count = 0;
+                console.log('count is '+this.count);
+        }
+
+    };
+
 
 }(jQuery));

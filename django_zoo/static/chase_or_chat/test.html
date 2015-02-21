@@ -2,7 +2,8 @@
 <html>
 	<head>
 		<title>test</title>
-		<script src="http://canvasengine.net/cdn/canvasengine-latest.all.min.js"></script>
+        <script src='https://code.jquery.com/jquery-1.11.2.min.js'></script>
+        <script src='game.js'></script>
 	</head>
 
 	<body>
@@ -15,35 +16,9 @@
 
 </html>
 
-<script type="text/javascript" >
-var canvas = CE.defines("canvas").
-extend(Animation).
-ready(function() {
-    canvas.Scene.call("MyScene");
-});
+<script>
 
-canvas.Scene.new({
-    name: "MyScene",
-    materials: {
-        images: {
-            img_id: "http://canvasengine.net/examples/img/html5.png"
-        }
-    },
-    ready: function(stage) {
-        var element = this.createElement();
-        element.x = 100;
-        element.y = 50;
-        element.drawImage("img_id");
-        stage.append(element);
-
-        // Easing name : http://gsgd.co.uk/sandbox/jquery/easing/
-        canvas.Timeline.new(element).to({
-            x: 200,
-            y: 100
-        }, 100, Ease.easeInOutElastic).call();
-
-    }
-});
+$('#canvas').gameProc();
 
 
 </script>
