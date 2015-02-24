@@ -3,8 +3,8 @@
 <head>
     <title>live markdown</title>
     {% load staticfiles %}
-    <script src="{% static "jquery.js" %}"></script>
-    <link href="/static/md_std.css" rel="stylesheet">
+    <script src='{% static "js/jquery.js" %}'></script>
+    <link href='{% static "live_markdown/md_std.css" %}' rel="stylesheet">
     <style>
         .table{
             margin: 0 auto;
@@ -41,6 +41,7 @@
 
 </head>
 <body>
+    {% csrf_token %}
     <!-- {{ data|default:"3 &lt; 2" }} -->
     <div class='table'>
         <div class='textwrapper'>
@@ -56,6 +57,25 @@
 <script>
 (function($){
 
+    // a sample code for ajax with csrf token
+    // 'X-CSRFToken': getCookie('csrftoken')
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     function load_md(data){
         //load the html outputed by markdown module
         if(data != '' && data != 'undefined')
@@ -70,17 +90,19 @@
 
         $.ajax({
             type: "POST",
-            url: "/pro_markdown/",
+            headers: {'X-CSRFToken': getCookie('csrftoken')},
+            url: "{% url 'parse_markdown' %}",
             data: {'context': $('.edit').val()},
             dataType: "text",
             success: function(data){
+                console.log('ha');
                 load_md(data);
             }
         })
     }
 
     // setInterval(sendContent, 1000);
-    $('.edit').bind('input change', function(){
+    $('.edit').bind('input change', function(e){
         sendContent();
     })
 })(jQuery);

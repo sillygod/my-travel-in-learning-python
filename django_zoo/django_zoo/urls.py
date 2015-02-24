@@ -7,4 +7,6 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^live_markdown/', include('live_markdown.urls')),
+    # url(r'^web_crawler/$', include('web_crawler.urls')),
 )

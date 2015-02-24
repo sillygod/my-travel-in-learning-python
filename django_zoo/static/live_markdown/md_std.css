@@ -1,12 +1,8 @@
-code {
-    padding: 3px;
-    margin: 3px;
-    background: rgb(150, 140, 110);
 
-}
 
 .codehilite{
     border-radius: 6px;
+    background: #2FAD47;
 }
 
 h1 {
