@@ -1,15 +1,14 @@
 import pygame
 import sys
 from pygame.locals import *
-import os
 from pygame.font import SysFont
 
-# TODO
+# TODO: add functions
 # first, add some simple gui wiget like button, label, ect.
 # second, to think how to make gui wdiget beautiful structure
 
 
-class Action():
+class Action(object):
 
     '''
         FUNC:
@@ -39,7 +38,7 @@ class Action():
         Action.eventType[_func.__name__].append(_func)
 
 
-class Controller:
+class Controller(object):
 
     '''
         handle for the event queue
@@ -67,7 +66,7 @@ class Controller:
                     func()
 
 
-class App:
+class App(object):
 
     '''
     specify a flow control, every program should inherite this class to
@@ -81,7 +80,8 @@ class App:
         initial a pygame display
         '''
         pygame.init()
-        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE, 32)
+        self.screen = pygame.display.set_mode(
+            (width, height), pygame.RESIZABLE, 32)
         self.render = render(self.screen)
         self.control = Controller(App.action.eventType)
 
@@ -102,7 +102,7 @@ class App:
             pygame.display.update()
 
 
-class Cursor:
+class Cursor(object):
 
     def __init__(self):
 
@@ -145,7 +145,7 @@ class Cursor:
             pygame.mouse.set_cursor(*self.stringType[type])
 
 
-class posRecorder:
+class posRecorder(object):
 
     def __init__(self, x=0, y=0):
         self.pos = (x, y)
@@ -177,13 +177,12 @@ def forceInside(forceScope, rect):
         rect.top = (forceScope.top + forceScope.height) - rect.height
 
 
-class render:
+class render(object):
 
-    '''
-        responsible for the display of gui widget
-        I think there should be an object as a Controller
-        it can receive the data from the widget and then
-        draw its outline on the window
+    '''responsible for the display of gui widget
+    I think there should be an object as a Controller
+    it can receive the data from the widget and then
+    draw its outline on the window
     '''
 
     def __init__(self, screen):
@@ -199,8 +198,10 @@ class render:
             top and bottom border add extra length to fill that.
 
         '''
-        canvas = pygame.Surface((widget.rect.width, widget.rect.height), pygame.SRCALPHA)
-        canvas.fill(widget.bgColor, pygame.Rect(0, 0, widget.rect.width, widget.rect.height))
+        canvas = pygame.Surface(
+            (widget.rect.width, widget.rect.height), pygame.SRCALPHA)
+        canvas.fill(widget.bgColor, pygame.Rect(
+            0, 0, widget.rect.width, widget.rect.height))
 
         if(isinstance(widget.borderRect['top'], pygame.Rect)):
             pygame.draw.rect(
@@ -221,7 +222,7 @@ class render:
             self._hdc.blit(*c)  # unpack
 
 
-class widget:
+class widget(object):
 
     '''
         this is a basic element of gui.
@@ -302,7 +303,7 @@ class wImage(widget):
     '''
 
     def __init__(self, fname=None, **kwargs):
-        super().__init__(**kwargs)
+        super(wImage, self).__init__(**kwargs)
         if fname is not None:
             self.img = pygame.image.load(fname)
             self.resize_img = None
@@ -310,7 +311,7 @@ class wImage(widget):
             self.resize(self.rect.width, self.rect.height)
 
     def resize(self, width, height):
-        super().resize(width, height)
+        super(wImage, self).resize(width, height)
         self.resize_img = pygame.transform.scale(
             self.img, (self.rect.width, self.rect.height))
 
@@ -350,7 +351,7 @@ class Button(widget):
     '''
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(Button, self).__init__(**kwargs)
         self._state = ''
 
         self._style = {
@@ -406,7 +407,7 @@ class Label(widget):
     '''
 
     def __init__(self, text=None, **kwargs):
-        super().__init__(**kwargs)
+        super(Label, self).__init__(**kwargs)
         self.font_size = kwargs.get('font_size', 20)
         if text is not None:
             self.text = text
@@ -441,7 +442,8 @@ class ListBox(widget):
     '''
 
     def __init__(self, valueList, **kwargs):
-        self._list = [Label(text) for text in valueList if isinstance(text, str)]
+        self._list = [Label(text)
+                      for text in valueList if isinstance(text, str)]
 
     def expand(self):
         pass
@@ -464,17 +466,20 @@ def main():
 
         '''
         '''
+
         def __init__(self, width, height):
-            super().__init__(width, height)
+            super(MyApp, self).__init__(width, height)
             self.btn = Button(x=20, y=400, width=100, height=100,
-                              border={'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)},
+                              border={
+                                  'top': 5, 'left': 5, 'right': 5, 'bottom': 5, 'color': (128, 30, 30)},
                               mouse_in=(50, 100, 123),
                               mouse_out=(50, 100, 123, 100),
                               mouse_press=(50, 100, 103))
             self.btn.text = 'save'
 
             self.title = Label('This is a imageCropper', x=200, y=10, width=300, height=30,
-                               border={'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)},
+                               border={
+                                   'top': 5, 'left': 0, 'right': 0, 'bottom': 0, 'color': (70, 100, 50)},
                                bgColor=(125, 20, 80))
 
             self.crop = cropRect(x=200, y=50, width=300, height=300)
@@ -496,11 +501,10 @@ def main():
             self.render.render(self.btn)
             self.render.render(self.title)
 
-
     class cropRect(widget):
 
         def __init__(self, **kwargs):
-            super().__init__(**kwargs)
+            super(cropRect, self).__init__(**kwargs)
             self.img = None
             self.displayImg = None
             self.cursor = Cursor()
@@ -566,7 +570,8 @@ def main():
         def updateCrop(self):
             forceInside(
                 pygame.Rect(0, 0, self.rect.width, self.rect.height), self.crop.rect)
-            self.crop.copyFromImg(self.img.resize_img.subsurface(self.crop.rect))
+            self.crop.copyFromImg(
+                self.img.resize_img.subsurface(self.crop.rect))
             self.displayImg.copyFromImg(self.img.resize_img)
             self.displayImg.setAlpha(120)
 
