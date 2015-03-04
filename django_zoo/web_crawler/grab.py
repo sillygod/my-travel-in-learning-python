@@ -1,25 +1,6 @@
-from urllib import request
-from urllib import parse
-import os
-import re
-import json
-import abc
-import random
-
-import selenium
-from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-
 '''
-pchome hide so many details in background...
-however, it seems that I unveil its mask already... well, this is not all correct
+start to make this compatible with python 3 and 2
 
-now, another problem gank me...
-shit!
-
-OK!! now, go to find a library for this project.
 currently, **selenium** is my choice
 [here is the doc site](http://selenium-python.readthedocs.org/en/latest/getting-started.html)
 
@@ -37,6 +18,30 @@ yahoo mall miner
 
 
 '''
+import os
+import re
+import json
+import abc
+import random
+import sys
+
+
+if sys.version_info.major >= 3:
+    from urllib.request import urlopen
+    from urllib.request import Request
+    from urllib.error import HTTPError
+    from urllib.parse import urlencode
+else:
+    from urllib2 import urlopen
+    from urllib2 import Request
+    from urllib2 import HTTPError
+    from urllib import urlencode
+
+import selenium
+from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 
 
 class web_grabber:
@@ -58,18 +63,18 @@ class web_grabber:
         '''
         send a POST method and return the content
         '''
-        req = request.Request(self._site, data, self._headers)
-        self._content = request.urlopen(req)
+        req = Request(self._site, data, self._headers)
+        self._content = urlopen(req)
 
     def get(self, param=None):
         '''
         send a GET method and return the content
         '''
         if param:
-            self._site += parse.urlencode(param)
+            self._site += urlencode(param)
 
-        req = request.Request(self._site, headers=self._headers)
-        self._content = request.urlopen(req)
+        req = Request(self._site, headers=self._headers)
+        self._content = urlopen(req)
 
     def get_content(self):
         '''
@@ -84,17 +89,7 @@ class web_grabber:
         return self._content.read()
 
 
-class Modelprod:
-
-    '''
-    an encapsulation for data grabbed from the web
-
-    contain some common behavior and data format
-    '''
-    pass
-
-
-class IMiner(metaclass=abc.ABCMeta):
+class IMiner(object):
 
     '''
     factory method
@@ -106,6 +101,8 @@ class IMiner(metaclass=abc.ABCMeta):
     2. get product data
     3. output
     '''
+
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def search(self, value):
@@ -361,7 +358,7 @@ class PChomeminer(IMiner):
             'picture': '',
             'price': ''}  # spec should be a dict
 
-        _driver = webdriver.PhantomJS('C:\\phantomjs-1.9.7-windows\\phantomjs.exe', service_log_path=os.path.devnull)
+        _driver = webdriver.PhantomJS('C:\\phantomjs-2.2.0-windows\\phantomjs.exe', service_log_path=os.path.devnull)
         _driver.get(entity['site'])  # start grab prod site info
 
         prodModel['url'] = entity['site']
@@ -494,5 +491,5 @@ if __name__ == '__main__':
     res = miner.search('筆電')
     for o in res:
         miner.get_prod(o)
-        miner.output()
+        print(miner.output())
         break
