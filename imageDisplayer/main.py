@@ -5,11 +5,20 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
-import platform
 import os
-from urllib import request
 import io
 from view import Ui_MainWindow
+
+if sys.version_info.major >= 3:
+    from urllib.request import urlopen
+    from urllib.request import Request
+    from urllib.error import HTTPError
+    from urllib.parse import urlencode
+else:
+    from urllib2 import urlopen
+    from urllib2 import Request
+    from urllib2 import HTTPError
+    from urllib import urlencode
 
 
 class imgDisplay(QGraphicsScene):
@@ -19,7 +28,7 @@ class imgDisplay(QGraphicsScene):
     '''
 
     def __init__(self, fname=None, byteIO=None, parent=None):
-        super().__init__(parent)
+        super(imgDisplay, self).__init__(parent)
         self.img = None
         self._container = None
 
@@ -34,7 +43,7 @@ class imgDisplay(QGraphicsScene):
             self.setSceneRect(QRectF(self.retRect()))
             self._container = None
 
-            #self.img.supportsAnimation wierd why jpg is also support?
+            # self.img.supportsAnimation wierd why jpg is also support?
             if self.img.imageCount() > 1:
                 super().startTimer(self.img.nextImageDelay())
                 self._distractImg()
@@ -72,7 +81,7 @@ class imgDisplay(QGraphicsScene):
         self.update()
 
 
-class fileBrowser:
+class fileBrowser(object):
 
     '''
         add an icon to folder, and scrollbar?
@@ -80,7 +89,7 @@ class fileBrowser:
     '''
 
     def __init__(self, view=None, path=None, treeview=None):
-        super().__init__()
+        super(fileBrowser, self).__init__()
         self._path = os.getcwd() if path is None else path
         self._view = view
 
@@ -96,7 +105,7 @@ class fileBrowser:
 
         if os.path.isdir(fname):
             self._treeview.expand(index)
-        #check the extension
+        # check the extension
         elif os.path.splitext(fname)[1].lower() in ''.join(self.retSupFmt()):
             obj = imgDisplay(fname)
             self._view.setScene(obj)
@@ -143,14 +152,12 @@ class fileBrowser:
 
 class mainWindow(QMainWindow, Ui_MainWindow):
 
-    '''
-        dockwidget can only dock in qmainwindow
-        add some keyboard control: left key and right key for surfing the image
-
+    '''dockwidget can only dock in qmainwindow
+    add some keyboard control: left key and right key for surfing the image
     '''
 
     def __init__(self):
-        super().__init__()
+        super(mainWindow, self).__init__()
         self.setupUi(self)
         self.act = {}
         self.fileBrowser = fileBrowser(view=self.view, treeview=self.treeView)
@@ -178,7 +185,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             don't write QBuffer( QByteArray(img_file.read()))
             this will cause some problem...
         '''
-        webImg = request.urlopen(self.lineEdit.text())
+        webImg = urlopen(self.lineEdit.text())
         img_file = io.BytesIO(webImg.read())
         data = QByteArray(img_file.read())
         temp = QBuffer(data)
