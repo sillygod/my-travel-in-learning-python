@@ -1,6 +1,6 @@
 # What is django-zoo
 
-django-zoo contains lots of apps I want to practice. There is no speciifc type of apps. I just do what I want :)
+django-zoo contains lots of apps I want to practice and implement. There is no speciifc type of apps. I just do what I want :)
 
 # sturcutre
 
@@ -42,3 +42,20 @@ templates/
         ...
         .
 ```
+
+well, maybe I should use reusable app structure here. That means every app should has the structure like the following.
+
+```
+app/
+    static/
+        ...
+    template/
+        ...
+    urls.py
+    models.py
+    views.py
+    ..
+    .
+```
+
+I have not decided which one to use yet.
