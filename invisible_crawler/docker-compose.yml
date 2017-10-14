@@ -1,0 +1,7 @@
+version: '3'
+services:
+  sacred:
+    build: .
+    volumes:
+     - .:/app
+    command: python example.py
