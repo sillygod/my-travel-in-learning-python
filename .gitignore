@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *.pyc
 
+.vscode/
+
 # C extensions
 *.so
 

@@ -10,7 +10,9 @@ So I try to run crawler in a invisible GUI service.
 
 python 3.5
 selenium
+pyvirtualdisplay
 chromium
+docker python:alpine (smallest python docker image)
 
 
 # How to Run

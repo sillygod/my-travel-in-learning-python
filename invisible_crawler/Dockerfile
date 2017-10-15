@@ -23,6 +23,7 @@ RUN apk update && \
 
 # RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
 #     apk -i 'google-chrome*.deb'
+# I don't know how to install deb file in arch linux.. so use apk install instead
 
 RUN mkdir app && cd app
 COPY . /app/
