@@ -1,7 +1,7 @@
 # my-travel-in-learning-python
 
 
-This repository may contain some projects or practices I want to make a note. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
+This repository may contain some small projects or practices I want to make a note. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
 
 
 ### Intention
@@ -38,5 +38,24 @@ proj/
 
 ```
 
-everything you need just `pip install` or `docker-compose` if provided `docker-compose.yml`
+Everything you need just `pip install` or `docker-compose` if provided `docker-compose.yml` 
 
+In the future, I consider to use docker to encapsulate the env.
+
+# Interesting usage
+
+we can run a gui application in docker and forward x11 in mac to display gui.
+
+ex.
+
+install `XQuartz`
+
+```sh
+IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
+xhost + $IP
+
+docker run -d --name firefox -e DISPLAY=$IP:0 -v /tmp/.X11-unix:/tmp/.X11-unix jess/firefox
+
+```
+
+then you will see the magic..

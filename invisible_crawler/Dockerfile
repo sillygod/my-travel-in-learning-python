@@ -1,5 +1,14 @@
 FROM python:3.5-alpine
 MAINTAINER jing
+
+# alpine-sdk
+# mariadb-dev equivalent to libmysqlclient-dev in ubuntu
+# if you want to use the latest stable package source for apk you 
+# can add
+# http://dl-3.alpinelinux.org/alpine/latest-stable/
+
+# RUN echo "http://dl-3.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories
+
 RUN apk update && \ 
     apk add --no-cache \
             xvfb \
