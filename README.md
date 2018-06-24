@@ -1,7 +1,7 @@
 # my-travel-in-learning-python
 
 
-This repository may contain some small projects or practices I want to make a note. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
+This repository may contain some small projects or practices I want to take a note. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
 
 
 ### Intention
@@ -11,8 +11,9 @@ In order to learning python, I think some projects to implement and try hard to 
  - pygame
  - pyqt
  - django
- - ...
+ - asyncio
 
+Recently, I will put some practice about python standard lib, programming concepts or notes about some blogs or posts.
 
 # projecct-list
 
@@ -39,6 +40,8 @@ proj/
 ```
 
 Everything you need just `pip install` or `docker-compose` if provided `docker-compose.yml` 
+
+# Future
 
 In the future, I consider to use docker to encapsulate the env.
 

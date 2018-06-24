@@ -3,14 +3,12 @@ import time
 import gevent.monkey
 import requests
 from urllib.request import urlopen
+mtart = time.time()
 gevent.monkey.patch_all()
 
 
-start = time.time()
-
 
 urls = ['http://www.google.com', 'http://www.yandex.ru', 'http://www.python.org', 'http://www.python.org', 'http://www.python.org'] * 3
-
 
 
 def print_head(url):
