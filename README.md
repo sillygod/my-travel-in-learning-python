@@ -1,8 +1,9 @@
 # my-travel-in-learning-python
 
 
-This repository may contain some small projects or practices I want to take a note. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
+This repository contains some small projects I want to take a note about or practice. It is just like a traveler to take a snap shot of everything everywhere. Python is my favorite programming language and it has lots of amazing merits and something shock.
 
+Recently, I add some helper tool for my job to solve some tired mission.
 
 ### Intention
 
@@ -14,16 +15,6 @@ In order to learning python, I think some projects to implement and try hard to 
  - asyncio
 
 Recently, I will put some practice about python standard lib, programming concepts or notes about some blogs or posts.
-
-# projecct-list
-
- - 2d collision
- - django_zoo
- - cli_chatroom
- - imageCropper
- - imageDisplayer
- - ...maybe more
-
 
 # structure
 

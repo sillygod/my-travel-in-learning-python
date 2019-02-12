@@ -1,0 +1,17 @@
+gcs_host: "https://storage.googleapis.com/staging-user-upload/legacy_test/"
+download_folder: "test_downloads"
+gcs_path: "legacy_test"
+bucket_name: "staging-user-uploaded"
+source_map_name: "test_source.db"
+
+mysql:
+  - member:
+      username: "root"
+      password: "1234"
+      host: "127.0.0.1"
+      port: 3306
+      db_name: "member"
+      params:
+        parseTime: True
+        charset: utf8
+

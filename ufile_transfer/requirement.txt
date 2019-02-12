@@ -1,0 +1,7 @@
+requests
+mysqlclient
+pyyaml
+google-cloud-storage
+pytest
+click
+python-magic
