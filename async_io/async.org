@@ -1,11 +1,11 @@
 #+TITLE: Python Async&Await
 #+DESCRIPTION: Notes about python async await
 #+PROPERTY: header-args:python :session py3.6
-#+PROPERTY: header-args :results output 
+#+PROPERTY: header-args :results output
 #+PROPERTY: header-args+ :exports both
 
 * Setup Eval Env
-  
+
   #+begin_src elisp :session py3.6 :results silent :exports none
     (pyvenv-activate "~/miniconda2/envs/py3.6")
   #+end_src
@@ -18,9 +18,8 @@
   #+end_src
 
   #+RESULTS:
-  : 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33) 
+  : 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
   : [GCC 4.2.1 Compatible Clang 4.0.1 (tags/RELEASE_401/final)]
-
 
 * Intro
 
@@ -28,7 +27,7 @@
 
   在普遍的程式，執行順序都是一行一行執行，每次要繼續往下執行前，都會等著上一行完成，也就是俗稱的Sequential programming，那麼這樣的編程可能會遇到什麼問題呢？ 最大的問題就是如果上一行執行太久的話，我一定要等上一行執行完我才能夠繼續往下走嗎？ 最常見的情況就是api request，得到回傳結果，我才能繼續往下走，但是其實我下面接著要做的並不用等這個結果就可以執行了，所以就會耗費無意義的時間，為了解決這樣的事情，會使用thread。
 
-  process 可以產生多個 thread，可以讓你的程式一次做很多事情，把它想成影分身，主體只有一個，但是你的分身卻可以同時幫你做其他事情。 
+  process 可以產生多個 thread，可以讓你的程式一次做很多事情，把它想成影分身，主體只有一個，但是你的分身卻可以同時幫你做其他事情。
 
   上面這張圖，說明了什麼？ 帥！ 哈哈，其實是想表達，鳴人自己(process)，開出了很多分身(thread)，每個分身都做不同的事情
 
@@ -39,9 +38,9 @@
   - resource starvavtion
 
     先撇除上面會遇到的問題，thread還有著一個成本就是cpu的context switch，因為一顆cpu一次只能run一個thread，它實際上背後用很快的速度在進行thread的交換並執行，這就是所謂的context switch。那麼會有既可以達到多工的效果，又可以免除遇到上述的race condition等等問題的技術存在嗎？！ 答案是有的，那就是今天我們要講的主題 python async io。
-    
+
     ayncio背後其實是用到[[https://en.wikipedia.org/wiki/Coroutine][Coroutine]]的概念實作，從wiki上面來看，其實coroutine就是一種可以中斷及繼續執行函式呼叫的技術，直接從下面的例子來看！
-    
+
     #+begin_src python
 
       def n_hello():
@@ -85,14 +84,14 @@
     in function 1
     in function 2
     #+end_example
-    
+
   上面就是python最基本支援coroutine的使用方式，第一個function n_hello 是一般的for loop版本的印出數字，另外一個function c_hello 是使用yield，藉此讓你看看兩者行為，明顯的感受出使用yield可以將程式的執行順序從subroutine轉回到main，繼續呼叫next又可以跳回去subroutine。
 
   有沒有覺得跟multi thread很像呢，基本上是行為是差不多的，但是coroutine是基於中斷函式，繼續執行其他函式的方式來達到多工，並不像multi thread，會有同時兩個thread執行同份程式碼的問題，進而造成前面所說的，race condition, dead lock.. 那些問題，前面使用鳴人的影分身來比喻multi thread，對於coroutine，我個人想要使用下面這張來比喻
-  
+
 #+DOWNLOADED: https://camo.githubusercontent.com/5d50bc87ae99ed8e918c8c1349fd290a014a7f77/68747470733a2f2f7777772e7175697a7a2e62697a2f75706c6f6164732f7175697a7a2f3235373237342f6f7269672f312e6a70673f31343739363632383932 @ 2019-09-24 16:03:22
 [[file:img/Intro/68747470733a2f2f7777772e7175697a7a2e62697a2f75706c6f6164732f7175697a7a2f3235373237342f6f7269672f312e6a70673f31343739363632383932_2019-09-24_16-03-22.jpeg]]
- 
+
 影子模仿術，鹿丸放出多條影子(coroutine)，藉由自己的大腦來控制所有人的行動。
 那麼接著再稍微深入看看yield的使用方式，前面使用方式是yield把值從function傳出去，那麼我們今天可以把值從外面傳到function裡面使用嗎？ 答案是可以的！ 以下看看例子
 
@@ -146,7 +145,7 @@
       value = yield from w
       print("no exception {}".format(value))
       yield
-    
+
   t = test_yield_from()
   next(t)
   t.send(10)
@@ -156,7 +155,7 @@
   def amazing_yeild_from(x):
       yield from range(x)
       yield from range(x-1, -1, -1)
-    
+
   print(list(amazing_yeild_from(5)))
 #+end_src
 
@@ -165,9 +164,8 @@
 : no exception 10
 : [0, 1, 2, 3, 4, 4, 3, 2, 1, 0]
 
-
 * Asyncio.coroutine& yeild from
-  
+
 ~async 其實是Asyncio.coroutine的syntax sugar, await是yield from的syntax sugar~ 好像在python3.6之後就已經..變成不相容了，
 
 #+begin_src python
@@ -218,7 +216,6 @@
 :                       ^
 : SyntaxError: invalid syntax
 
-
 * Notes
 
 golang 沒有 reentrant lock
@@ -229,7 +226,7 @@ golang 沒有 reentrant lock
 
 * File Local Varaibles
   # Local Variables:
-  # org-confirm-babel-evaluate: nil 
+  # org-confirm-babel-evaluate: nil
   # End:
 
   # ;;; -*- org-confirm-babel-evaluate: nil; -*-

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "blockchain"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.8.7"
+fastapi = "^0.68.1"
+ecdsa = "^0.17.0"
+bit = "^0.7.2"
+uvicorn = "^0.15.0"
+web3 = "^5.23.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pre-commit = "^2.15.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
